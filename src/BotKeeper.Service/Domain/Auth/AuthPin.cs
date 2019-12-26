@@ -32,7 +32,9 @@ namespace BotKeeper.Service.Domain.Auth {
 		private async Task CheckBusinessRules(IUser user) {
 			int attempts = await user.GetPinAttempts();
 			if (attempts >= MAX_PIN_ATTEMPTS) {
+				// put in a separate entity 
 				await user.LockPin();
+				// create specific Exception 
 				throw new SecurityException($"Maximum number of pin attempts was reached.");
 			}
 		}
