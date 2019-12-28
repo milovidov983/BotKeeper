@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Domain.Store {
 	public interface IStore {
-		Task<int> GetPin(IUser user)
+		Task<int> GetPin(IUser user);
 	}
 }
