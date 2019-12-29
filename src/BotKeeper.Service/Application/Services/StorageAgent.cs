@@ -15,8 +15,8 @@ namespace BotKeeper.Service.Application {
 		}
 		public async Task<IPermission[]> GetPermissionFor(int userId, EntityType entityType) {
 			await Task.Yield();
-			var storage = await permissionStorageFactory.CreateStorageFor(userId, entityType);
-			return storage.GetPermissions();
+			var storage = await permissionStorageFactory.CreateStorageFor(entityType);
+			return await storage.GetPermissionsFor(userId);
 		}
 	}
 }

@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 namespace BotKeeper.Service.Application.Db {
 	internal class ChatEntityPermitionStorage : IPermissionStorage {
 		public IStorage storage;
+
+		public ChatEntityPermitionStorage(IStorage storage) {
+			this.storage = storage;
+		}
+
 		public IPermission[] GetPermissions() { 
 			throw new NotImplementedException()
 		}

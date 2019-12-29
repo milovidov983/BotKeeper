@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Application.Interfaces {
 	public interface IPermissionStorageFactory {
-		Task<IPermissionStorage> CreateStorageFor(int userId, EntityType entityType);
+		Task<IPermissionStorage> CreateStorageFor(EntityType entityType);
+		object CreateStorage(int userId);
 	}
 }

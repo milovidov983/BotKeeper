@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Domain.Interfaces {
 	public interface IPermissionStorage {
-		IPermission[] GetPermissions();
+		Task<IPermission[]> GetAllPermissions(int userId);
 	}
 }

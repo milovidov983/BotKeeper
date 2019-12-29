@@ -16,12 +16,12 @@ namespace BotKeeper.Service.Application.Db {
 			permissionStorages.Add(typeof(ChatEntity), new ChatEntityPermitionStorage(storage));
 		}
 
-		public async Task<IPermissionStorage> CreateStorageFor(int userId, EntityType entityType) {
+		public async Task<IPermissionStorage> CreateStorageFor(EntityType entityType) {
 			await Task.Yield();
 			var type = entityType.GetType();
 
 			if (permissionStorages.TryGetValue(type, out var store)) {
-				return store.GetStoreFor(userId);
+				return store;
 			}
 
 			throw new Exception($"Unknown type {type}");
