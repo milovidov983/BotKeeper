@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BotKeeper.Service.Application.Models {
-	interface IMessage {
+namespace BotKeeper.Service.Interfaces {
+	internal interface IBotClient {
 	}
 }

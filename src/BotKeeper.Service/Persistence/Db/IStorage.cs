@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BotKeeper.Service.Domain.Interfaces {
+namespace BotKeeper.Service.Persistence.Db {
 	public interface IStorage {
 		Task<T> Get<T>(int userId, string key);
 		Task<IEnumerable<string>> GetAllKeys(int userId);
