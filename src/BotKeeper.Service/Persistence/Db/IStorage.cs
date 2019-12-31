@@ -9,6 +9,6 @@ namespace BotKeeper.Service.Persistence.Db {
 		Task<IEnumerable<int>> GetAllUserIds();
 		Task Save(int userId);
 		Task Save<T>(int userId, string key, T value);
-		Task<IUser> GetUser(int id);
+		Task<IPersistedUser> GetUser(int id);
 	}
 }

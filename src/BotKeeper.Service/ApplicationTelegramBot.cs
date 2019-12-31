@@ -35,7 +35,7 @@
 
 		private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs) {
 			IUser user = await userFactory.Create(messageEventArgs.Message.From.Id);
-			IInteractor interactor = await interactorFactory.Create(user, botClient);
+			IInteractor interactor = interactorFactory.Create(user, botClient);
 			IMessage message = messageFactory.Create(messageEventArgs);
 
 			await interactor.Execute(message).ConfigureAwait(false);

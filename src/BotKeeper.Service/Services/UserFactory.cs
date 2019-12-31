@@ -1,5 +1,6 @@
 ﻿using BotKeeper.Service.Interfaces;
 using BotKeeper.Service.Models;
+using BotKeeper.Service.Models.Users;
 using BotKeeper.Service.Persistence.Db;
 using System;
 using System.Threading.Tasks;
@@ -14,10 +15,12 @@ namespace BotKeeper.Service.Services {
 
 		public async Task<IUser> Create(int id) {
 			var persistedUser = await storage.GetUser(id);
-			if(persistedUser is null) {
-				return new UnknownUser();
-			}
-			return persistedUser;
+			return (persistedUser?.Type) switch
+			{
+				"user" => new User(persistedUser),
+				"admin" => new Admin(persistedUser),
+				_ => new UnknownUser(id),
+			};
 		}
 	}
 }

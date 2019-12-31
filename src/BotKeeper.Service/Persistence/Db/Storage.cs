@@ -89,7 +89,7 @@ namespace BotKeeper.Service.Persistence.Db {
 
 
 		private readonly HashSet<int> userCachedIds = new HashSet<int>();
-		public Task<IUser> GetUser(int id) {
+		public Task<IPersistedUser> GetUser(int id) {
 			if (userCachedIds.Contains(id)) {
 				// get user from db
 			}
