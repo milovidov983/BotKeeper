@@ -1,30 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BotKeeper.Service {
-    using BotKeeper.Service.Interfaces;
-    using System;
-	using System.Threading.Tasks;
+﻿namespace BotKeeper.Service {
+	using BotKeeper.Service.Interfaces;
+	using System;
 	using Telegram.Bot;
 	using Telegram.Bot.Args;
-	using Telegram.Bot.Types;
-	using Telegram.Bot.Types.Enums;
-	public class Application {
+	internal class ApplicationTelegramBot {
 
-		private TelegramBotClient client;
-		private IUserFactory userFactory;
-		private IInteractorFactory interactorFactory;
-		private IMessageFactory messageFactory;
-		private IBotClient botClient;
+		private readonly TelegramBotClient client;
+		private readonly IUserFactory userFactory;
+		private readonly IInteractorFactory interactorFactory;
+		private readonly IMessageFactory messageFactory;
+		private readonly IBotClient botClient;
 
-		public Application(
+		public ApplicationTelegramBot(
 			TelegramBotClient client, 
 			IUserFactory userFactory, 
 			IInteractorFactory interactorFactory, 
 			IMessageFactory messageFactory, 
 			IBotClient botClient) {
-
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 			this.userFactory = userFactory ?? throw new ArgumentNullException(nameof(userFactory));
 			this.interactorFactory = interactorFactory ?? throw new ArgumentNullException(nameof(interactorFactory));
@@ -33,7 +25,6 @@ namespace BotKeeper.Service {
 		}
 
 		public void Run() {
-			client = new TelegramBotClient("");
 			client.OnMessage += BotOnMessageReceived;
 			client.OnMessageEdited += BotOnMessageReceived;
 			client.StartReceiving();

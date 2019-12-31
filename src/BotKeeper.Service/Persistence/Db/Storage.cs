@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using BotKeeper.Service.Domain.Exceptions;
 using System.IO;
 using Newtonsoft.Json;
+using BotKeeper.Service.Models;
+using BotKeeper.Service.Interfaces;
 
 namespace BotKeeper.Service.Persistence.Db {
-	public class Storage : IStorage, IDisposable {
+	internal class Storage : IStorage, IDisposable {
 		private ConcurrentDictionary<int, ConcurrentDictionary<string, string>> storage =
 			new ConcurrentDictionary<int, ConcurrentDictionary<string, string>>();
 
@@ -85,6 +85,16 @@ namespace BotKeeper.Service.Persistence.Db {
 
 		public void Dispose() {
 			Save();
+		}
+
+
+		private readonly HashSet<int> userCachedIds = new HashSet<int>();
+		public Task<IUser> GetUser(int id) {
+			if (userCachedIds.Contains(id)) {
+				// get user from db
+			}
+
+			return null;
 		}
 	}
 }
