@@ -9,5 +9,6 @@ namespace BotKeeper.Service.Interfaces {
 		void Error(Exception ex, string message);
 		void Warn(Exception ex, string message);
 		void Info(string message);
+		void Error(Exception e, Dictionary<string, object> requestInfo);
 	}
 }

@@ -32,14 +32,7 @@ namespace BotKeeper.Service {
 				logger.Info($"Bot id: {me.Id} name is {me.FirstName}.");
 
 				using (var store = new Storage()) {
-					var userFactory = new UserFactory(store);
-					var interactionStore = new InteractonFactory(store);
-					var registrationService = new RegistrationService(store);
-					var interactorFactory = new InteractorFactory(interactionStore, registrationService);
-					var messageFactory = new MessageFactory();
-					var botClient = new BotClient(telegramClient);
-
-					var app = new ApplicationTelegramBot(telegramClient, userFactory, interactorFactory, messageFactory, botClient);
+					var app = new ApplicationBot(telegramClient, store);
 					app.Run();
 
 
@@ -50,6 +43,11 @@ namespace BotKeeper.Service {
 			} catch(Exception e) {
 				logger.Error(e);
 			}
+
+			// Клиентский код.
+
+
+
 		}
 
 	}

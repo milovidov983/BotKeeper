@@ -108,8 +108,8 @@ namespace BotKeeper.Service.Persistence.Db {
 			if (sessions.TryGetValue(userId, out var session)) {
 				return session;
 			} else {
-				return new WelcomeInteraction();
-
+				//return new WelcomeInteraction();
+				throw new Exception("debug");
 			}
 		}
 
@@ -171,5 +171,6 @@ namespace BotKeeper.Service.Persistence.Db {
 		public void Dispose() {
 			SaveDbToFileSystem().GetAwaiter().GetResult();
 		}
+
 	}
 }

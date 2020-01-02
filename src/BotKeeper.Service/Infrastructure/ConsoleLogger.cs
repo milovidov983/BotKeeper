@@ -1,7 +1,9 @@
 ﻿using BotKeeper.Service.Interfaces;
 using BotKeeper.Service.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BotKeeper.Service.Infrastructure {
@@ -15,6 +17,10 @@ namespace BotKeeper.Service.Infrastructure {
 
 		public void Error(Exception ex) {
 			Console.WriteLine($"ERROR: {ex.Message}");
+		}
+
+		public void Error(Exception e, Dictionary<string, object> requestInfo) {
+			Console.WriteLine($"ERROR: {JsonConvert.SerializeObject(requestInfo)}");
 		}
 
 		public void Info(string text) {

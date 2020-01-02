@@ -12,7 +12,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Core\Models\Interactions\" />
+	  <Folder Include="CoreLegacy\Helpers\" />
+	  <Folder Include="CoreLegacy\Models\Interactions\" />
 	</ItemGroup>
 
 </Project>
