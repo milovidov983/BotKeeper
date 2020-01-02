@@ -8,9 +8,9 @@ namespace BotKeeper.Service.Services.Interactors {
 	internal class AdminInteractor : IInteractor {
 		private BaseUser user;
 		private IBotClient client;
-		private readonly IInteractonStore interactionStore;
+		private readonly IInteractonFactory interactionStore;
 
-		public AdminInteractor(BaseUser user, IBotClient client, IInteractonStore interactionStore) {
+		public AdminInteractor(BaseUser user, IBotClient client, IInteractonFactory interactionStore) {
 			this.user = user;
 			this.client = client;
 			this.interactionStore = interactionStore;

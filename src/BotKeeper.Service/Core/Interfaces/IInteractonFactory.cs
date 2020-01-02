@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Interfaces {
-	internal interface IInteractonStore {
-		Task<IInteraction> Get(BaseUser user, long id);
+	internal interface IInteractonFactory {
+		Task<IInteraction> Get(BaseUser user);
 	}
 }

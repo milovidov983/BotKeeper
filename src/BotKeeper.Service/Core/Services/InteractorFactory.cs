@@ -12,9 +12,9 @@ namespace BotKeeper.Service.Services {
 
 		protected Dictionary<Type, Func<BaseUser, IBotClient, IInteractor>> interactors 
 			= new Dictionary<Type, Func<BaseUser, IBotClient, IInteractor>>();
-		private readonly IInteractonStore interactionStore;
+		private readonly IInteractonFactory interactionStore;
 		private readonly IRegistrationService registrationService;
-		public InteractorFactory(IInteractonStore interactionStore, IRegistrationService registrationService) {
+		public InteractorFactory(IInteractonFactory interactionStore, IRegistrationService registrationService) {
 			interactors.Add(typeof(Admin), CreateAdminInteractor);
 			interactors.Add(typeof(User), CreateUserInteractor);
 			interactors.Add(typeof(UnknownUser), CreateGuestInteractor);
@@ -53,6 +53,5 @@ namespace BotKeeper.Service.Services {
 			throw new NotImplementedException();
 			return new GuestInteractor(context);
 		}
-
 	}
 }

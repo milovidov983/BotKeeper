@@ -33,7 +33,7 @@ namespace BotKeeper.Service {
 
 				using (var store = new Storage()) {
 					var userFactory = new UserFactory(store);
-					var interactionStore = new InteractonStore(store);
+					var interactionStore = new InteractonFactory(store);
 					var registrationService = new RegistrationService(store);
 					var interactorFactory = new InteractorFactory(interactionStore, registrationService);
 					var messageFactory = new MessageFactory();

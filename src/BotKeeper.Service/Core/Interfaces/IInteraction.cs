@@ -1,4 +1,5 @@
-﻿using BotKeeper.Service.Models.Messages;
+﻿using BotKeeper.Service.Core.Models;
+using BotKeeper.Service.Models.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,6 @@ namespace BotKeeper.Service.Interfaces {
 	internal interface IInteraction {
 		InteractionTypes Type { get; }
 
-		Task<string> GenerateAnswer(TextMessage message, BaseUser user);
+		Task<IntercationResponse> GenerateAnswer(IMessage message);
 	}
 }

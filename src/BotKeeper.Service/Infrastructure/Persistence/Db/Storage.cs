@@ -12,11 +12,24 @@ using System.Linq;
 
 namespace BotKeeper.Service.Persistence.Db {
 	internal class Storage : IStorage, IDisposable {
+		/// <summary>
+		/// Users stores
+		/// </summary>
 		private ConcurrentDictionary<int, ConcurrentDictionary<string, string>> storage =
 			new ConcurrentDictionary<int, ConcurrentDictionary<string, string>>();
-
+		/// <summary>
+		/// Users db
+		/// </summary>
 		private ConcurrentDictionary<int, IPersistedUser> users = new ConcurrentDictionary<int, IPersistedUser>();
 		private HashSet<int> userCachedIds = new HashSet<int>();
+
+		/// <summary>
+		/// Session db
+		/// </summary>
+		private ConcurrentDictionary<int, IInteraction> sessions = new ConcurrentDictionary<int, IInteraction>();
+
+
+
 
 		public async Task<T> Get<T>(int userId, string key) {
 			await Task.Yield();
@@ -90,6 +103,15 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 		}
 
+		public async Task<IInteraction> GetSession(int userId) {
+			await Task.Yield();
+			if (sessions.TryGetValue(userId, out var session)) {
+				return session;
+			} else {
+				return new WelcomeInteraction();
+
+			}
+		}
 
 		#region Helpers
 		private async Task<bool> CreateNewUser(int id) {
@@ -116,30 +138,35 @@ namespace BotKeeper.Service.Persistence.Db {
 
 		private readonly string fileDb = @"db.json";
 		private readonly string fileUsers = @"users.json";
+		private readonly string fileSessions = @"sessions.json";
 		public async Task SaveDbToFileSystem() {
 			var jsonDb = JsonConvert.SerializeObject(storage);
 			var jsonUsers = JsonConvert.SerializeObject(users);
+			var jsonSessions = JsonConvert.SerializeObject(sessions);
 
 			using StreamWriter dbSw = File.CreateText(fileDb);
 			using StreamWriter usersSw = File.CreateText(fileUsers);
+			using StreamWriter sessionsSw = File.CreateText(fileSessions);
 
 			await Task.WhenAll(
 				dbSw.WriteLineAsync(jsonDb),
-				usersSw.WriteLineAsync(jsonUsers)
+				usersSw.WriteLineAsync(jsonUsers),
+				sessionsSw.WriteLineAsync(jsonSessions)
 			);
 		}
 
 		public void LoadDb() {
 			var data = File.ReadAllText(fileDb);
 			var usersDb = File.ReadAllText(fileUsers);
+			var sessionsDb = File.ReadAllText(fileSessions);
 
 			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<int, ConcurrentDictionary<string, string>>>(data);
 			users = JsonConvert.DeserializeObject<ConcurrentDictionary<int, IPersistedUser>>(usersDb);
+			sessions = JsonConvert.DeserializeObject<ConcurrentDictionary<int, IInteraction>>(sessionsDb);
 			userCachedIds = users.Keys.Select(id => id).ToHashSet();
 		}
 
 		#endregion
-
 
 		public void Dispose() {
 			SaveDbToFileSystem().GetAwaiter().GetResult();

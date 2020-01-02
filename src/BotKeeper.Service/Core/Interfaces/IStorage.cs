@@ -11,5 +11,6 @@ namespace BotKeeper.Service.Interfaces {
 		Task Save<T>(int userId, string key, T value);
 		bool IsUserExist(int id);
 		Task<IPersistedUser> GetUser(int id);
+		Task<IInteraction> GetSession(int userId);
 	}
 }

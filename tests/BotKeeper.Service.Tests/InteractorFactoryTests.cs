@@ -13,7 +13,7 @@ namespace BotKeeper.Service.Tests {
 
 
 	public class InteractorFactoryTests {
-		private readonly IInteractonStore mockIInteractonStore = (new Mock<IInteractonStore>()).Object;
+		private readonly IInteractonFactory mockIInteractonStore = (new Mock<IInteractonFactory>()).Object;
 		private readonly IRegistrationService mockIRegistrationService = (new Mock<IRegistrationService>()).Object;
 
 
@@ -54,7 +54,7 @@ namespace BotKeeper.Service.Tests {
 		#region helper classes
 		private class InteractorFactoryUnderTest : InteractorFactory {
 			public InteractorFactoryUnderTest(
-				IInteractonStore interactionStore,
+				IInteractonFactory interactionStore,
 				IRegistrationService registrationService)
 				: base(interactionStore, registrationService) {
 			}

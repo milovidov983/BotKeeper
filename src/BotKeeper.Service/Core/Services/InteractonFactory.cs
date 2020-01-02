@@ -6,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Core.Services {
-	internal class InteractonStore : IInteractonStore {
+	internal class InteractonFactory : IInteractonFactory {
 		private readonly IStorage storage;
 
-		public InteractonStore(IStorage storage) {
+		public InteractonFactory(IStorage storage) {
 			this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
 		}
 
-		public Task<IInteraction> Get(BaseUser user, long id) {
+		public Task<IInteraction> Get(BaseUser user) {
 			throw new NotImplementedException();
 		}
 	}
