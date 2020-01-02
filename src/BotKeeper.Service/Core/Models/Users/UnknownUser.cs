@@ -10,5 +10,7 @@ namespace BotKeeper.Service.Models.Users  {
 		public UnknownUser(int id) {
 			this.id = id;
 		}
+
+		public int Id => id;
 	}
 }

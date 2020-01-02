@@ -4,6 +4,8 @@ using System.Text;
 
 namespace BotKeeper.Service.Interfaces {
 	internal interface IPersistedUser {
-		string Type { get; }
+		string Type { get; set; }
+		string Data { get; set; }
+		int Id { get; set; }
 	}
 }
