@@ -17,7 +17,7 @@ namespace BotKeeper.Service.Core.States {
 
         public override void Login(MessageEventArgs messageEventArgs) {
             context.Sender.Send("Type and send your password:", messageEventArgs);
-            context.TransitionTo(new LoginState(), messageEventArgs.Message.Chat.Id);
+            context.TransitionTo(new LoginState(), messageEventArgs.Message.From.Id);
         }
 
         public override void Register(MessageEventArgs messageEventArgs) {

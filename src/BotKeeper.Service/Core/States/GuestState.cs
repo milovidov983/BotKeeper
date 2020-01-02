@@ -20,7 +20,7 @@ namespace BotKeeper.Service.Core.States {
 
         public override void Register(MessageEventArgs messageEventArgs) {
             context.Sender.Send("Enter your name:", messageEventArgs);
-            context.TransitionTo(new RegisterState(), messageEventArgs.Message.Chat.Id);
+            context.TransitionTo(new RegisterState(), messageEventArgs.Message.From.Id);
         }
 
         public override void ShowHelp(MessageEventArgs messageEventArgs) {

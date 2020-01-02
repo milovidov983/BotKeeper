@@ -29,7 +29,7 @@
 		}
 
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
-			var userId = request.Message.Chat.Id;
+			var userId = request.Message.From.Id;
 			Context context = CreateContext(request, userId);
 			var command = ParseMessage(request.Message.Text);
 			HandleCommand(request, context, command);

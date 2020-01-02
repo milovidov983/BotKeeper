@@ -44,9 +44,9 @@
 			//var message = messageEventArgs.Message;
 			//if (message?.Type == MessageType.Text) {
 
-			//	await client.DeleteMessageAsync(message.Chat.Id, message.MessageId).ConfigureAwait(false);
+			//	await client.DeleteMessageAsync(Message.From.Id, message.MessageId).ConfigureAwait(false);
 
-			//	await client.SendTextMessageAsync(message.Chat.Id, message.Text);
+			//	await client.SendTextMessageAsync(Message.From.Id, message.Text);
 			//}
 		}
 	}

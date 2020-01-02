@@ -13,7 +13,7 @@ namespace BotKeeper.Service.Services {
 				case Telegram.Bot.Types.Enums.MessageType.Unknown:
 					break;
 				case Telegram.Bot.Types.Enums.MessageType.Text:
-					return new TextMessage(msg.Message.Text, msg.Message.Chat.Id, msg.Message.MessageId);
+					return new TextMessage(msg.Message.Text, msg.Message.From.Id, msg.Message.MessageId);
 				case Telegram.Bot.Types.Enums.MessageType.Photo:
 					break;
 				case Telegram.Bot.Types.Enums.MessageType.Audio:

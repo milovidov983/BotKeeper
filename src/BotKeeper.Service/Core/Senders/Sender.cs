@@ -14,7 +14,7 @@ namespace BotKeeper.Service.Core.Senders {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 		}
 		public void Send(string text, MessageEventArgs request) {
-			Ext.SafeRun(async () => await client.SendTextMessageAsync(request.Message.Chat.Id, text));
+			Ext.SafeRun(async () => await client.SendTextMessageAsync(request.Message.From.Id, text));
 		}
 	}
 }

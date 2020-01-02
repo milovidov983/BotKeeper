@@ -18,16 +18,16 @@ namespace BotKeeper.Service.Core.States {
         public override void Login(MessageEventArgs messageEventArgs) {
             var password = messageEventArgs.Message.Text.Trim();
 
-            var user = context.UserService.Get(messageEventArgs.Message.Chat.Id);
+            var user = context.UserService.Get(messageEventArgs.Message.From.Id);
             if(user.Secret == password.Hash()) {
                 context.Sender.Send($"Welcome {user.Name}!", messageEventArgs);
-                context.TransitionTo(new VerifiedUserState(), messageEventArgs.Message.Chat.Id);
+                context.TransitionTo(new VerifiedUserState(), messageEventArgs.Message.From.Id);
             } else {
                 var hasAttempt = AnyAttempts(user);
                 if (hasAttempt) {
                     context.Sender.Send("Wrong password, try again: ", messageEventArgs);
                 } else {
-                    context.TransitionTo(new GuestState(), messageEventArgs.Message.Chat.Id);
+                    context.TransitionTo(new GuestState(), messageEventArgs.Message.From.Id);
                 }
             }
         }
