@@ -64,7 +64,10 @@ namespace BotKeeper.Service.Services {
 					break;
 				case Telegram.Bot.Types.Enums.MessageType.MigratedFromGroup:
 					break;
+				// TODO delete Enums.MessageType.Animation 
+#pragma warning disable CS0618
 				case Telegram.Bot.Types.Enums.MessageType.Animation:
+#pragma warning restore CS0618
 					break;
 				case Telegram.Bot.Types.Enums.MessageType.Poll:
 					break;

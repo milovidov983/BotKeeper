@@ -1,4 +1,6 @@
-﻿namespace BotKeeper.Service {
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("DynamicProxyGenAssembly2")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("BotKeeper.Service.Tests")]
+namespace BotKeeper.Service {
     using BotKeeper.Service.Core.Services;
     using BotKeeper.Service.Infrastructure;
     using BotKeeper.Service.Persistence.Db;
@@ -9,7 +11,7 @@
 	using Telegram.Bot.Args;
 	using Telegram.Bot.Types;
 	using Telegram.Bot.Types.Enums;
-	   
+	
 	class Program {
 
 		static async Task Main(string[] args) {

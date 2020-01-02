@@ -112,11 +112,11 @@ namespace BotKeeper.Service.Persistence.Db {
 		}
 		#endregion
 
-		#region FILESYSTEM
+		#region File system
 
 		private readonly string fileDb = @"db.json";
 		private readonly string fileUsers = @"users.json";
-		public async Task Save() {
+		public async Task SaveDbToFileSystem() {
 			var jsonDb = JsonConvert.SerializeObject(storage);
 			var jsonUsers = JsonConvert.SerializeObject(users);
 
@@ -129,7 +129,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			);
 		}
 
-		public void Load() {
+		public void LoadDb() {
 			var data = File.ReadAllText(fileDb);
 			var usersDb = File.ReadAllText(fileUsers);
 
@@ -142,7 +142,7 @@ namespace BotKeeper.Service.Persistence.Db {
 
 
 		public void Dispose() {
-			Save().GetAwaiter().GetResult();
+			SaveDbToFileSystem().GetAwaiter().GetResult();
 		}
 	}
 }

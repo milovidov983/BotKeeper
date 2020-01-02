@@ -12,6 +12,6 @@ namespace BotKeeper.Service.Interfaces {
 	internal interface IInteraction {
 		InteractionTypes Type { get; }
 
-		Task<string> GenerateAnswer(TextMessage message, IUser user);
+		Task<string> GenerateAnswer(TextMessage message, BaseUser user);
 	}
 }

@@ -13,7 +13,7 @@ namespace BotKeeper.Service.Core.Services {
 			this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
 		}
 
-		public Task<IInteraction> Get(IUser user, long id) {
+		public Task<IInteraction> Get(BaseUser user, long id) {
 			throw new NotImplementedException();
 		}
 	}

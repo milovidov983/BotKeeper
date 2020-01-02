@@ -12,7 +12,7 @@ namespace BotKeeper.Service.Core.Services {
 			this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
 		}
 
-		public Task<string> StartRegistrationFor(IUser user) {
+		public Task<string> StartRegistrationFor(BaseUser user) {
 			throw new NotImplementedException();
 		}
 	}

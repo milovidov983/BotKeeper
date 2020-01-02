@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace BotKeeper.Service.Models.Users  {
-	internal class UnknownUser : IUser {
+	internal class UnknownUser : BaseUser {
 		private int id;
 
 		public UnknownUser(int id) {
 			this.id = id;
 		}
 
-		public int Id => id;
+		public override int Id => id;
 	}
 }

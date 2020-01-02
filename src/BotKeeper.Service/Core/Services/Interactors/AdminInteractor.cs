@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Services.Interactors {
 	internal class AdminInteractor : IInteractor {
-		private IUser user;
+		private BaseUser user;
 		private IBotClient client;
 		private readonly IInteractonStore interactionStore;
 
-		public AdminInteractor(IUser user, IBotClient client, IInteractonStore interactionStore) {
+		public AdminInteractor(BaseUser user, IBotClient client, IInteractonStore interactionStore) {
 			this.user = user;
 			this.client = client;
 			this.interactionStore = interactionStore;

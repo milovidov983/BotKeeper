@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace BotKeeper.Service.Models.Users {
-	internal class Admin : IUser {
-		private IPersistedUser persistedUser;
-		private int id;
+	internal class Admin : BaseUser {
+		private readonly IPersistedUser persistedUser;
+		private readonly int id;
 
 		public Admin(IPersistedUser persistedUser) {
 			this.persistedUser = persistedUser;
+			id = persistedUser.Id;
 		}
 
-		public int Id { get => id; }
+		public override int Id { get => id; }
 	}
 }

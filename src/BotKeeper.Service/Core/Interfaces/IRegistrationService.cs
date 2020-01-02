@@ -5,6 +5,6 @@ using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Interfaces {
 	internal interface IRegistrationService {
-		Task<string> StartRegistrationFor(IUser user);
+		Task<string> StartRegistrationFor(BaseUser user);
 	}
 }

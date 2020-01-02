@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Services.Interactors {
 	internal class GuestInteractor : BaseInteractor {
-		private readonly IUser user;
+		private readonly BaseUser user;
 		private readonly IBotClient client;
 		private readonly IInteractonStore interactionStore;
 		private readonly IRegistrationService registrationService;

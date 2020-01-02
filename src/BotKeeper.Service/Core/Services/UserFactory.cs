@@ -14,7 +14,7 @@ namespace BotKeeper.Service.Services {
 			this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
 		}
 
-		public async Task<IUser> Create(int id) {
+		public async Task<BaseUser> Create(int id) {
 			var isUserExist = storage.IsUserExist(id);
 			if (isUserExist) {
 				var persistedUser = await storage.GetUser(id);
