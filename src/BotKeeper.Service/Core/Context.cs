@@ -24,15 +24,18 @@ namespace BotKeeper.Service.Core {
             this.TransitionTo(state);
             this.storage = storage;
             this.client = client;
+            UserService = new UserService(storage);
             Sender = new Sender(client);
         }
 
-        public object TransitionTo(State state) {
+        public object TransitionTo(State state, long? userId = null) {
             if(currentState == state) {
                 return empty;
             }
-
             currentState = state;
+            if (userId.HasValue) {
+                storage.SetUserState(userId.Value, state);
+            }
             currentState.SetContext(this);
             return empty;
         }
@@ -46,6 +49,9 @@ namespace BotKeeper.Service.Core {
         }
 
         public void Register(MessageEventArgs messageEventArgs) {
+            //currentState.Register(messageEventArgs);
+        }       
+        public void Handle(MessageEventArgs messageEventArgs) {
             currentState.Handle(messageEventArgs);
         }
 

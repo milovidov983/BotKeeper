@@ -5,12 +5,20 @@ using System.Text;
 
 namespace BotKeeper.Service.Core.Services {
     internal class UserService {
-        public User Get(long id) {
+		private IStorage storage;
+
+		public UserService(IStorage storage) {
+			this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
+		}
+
+		public User Get(long id) {
+
+
             return new User { Type = UserType.Guest };
         }
 
-		internal bool IsUserExist(long id) {
-			throw new NotImplementedException();
+		public bool IsUserExist(long id) {
+			return storage.IsUserExist(id);
 		}
 	}
 }

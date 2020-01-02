@@ -4,6 +4,7 @@
     using BotKeeper.Service.Interfaces;
 	using System;
     using System.Collections.Concurrent;
+    using System.Threading.Tasks;
     using Telegram.Bot;
 	using Telegram.Bot.Args;
 	internal class ApplicationBot {
@@ -27,28 +28,26 @@
 			client.StopReceiving();
 		}
 
-		private ConcurrentDictionary<long, State> userStates = new ConcurrentDictionary<long, State>();
-
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
 			var userId = request.Message.Chat.Id;
 			Context context = CreateContext(request, userId);
 			var command = ParseMessage(request.Message.Text);
 			HandleCommand(request, context, command);
+			await Task.Yield();
 		}
 
 		private Context CreateContext(MessageEventArgs request, long userId) {
-			var isCachedState = userStates.TryGetValue(userId, out var cachedState);
+			var cacheResult = storage.GetUserState(userId);
 
 			Context context = new Context(new GuestState(), storage, client);
-			if (isCachedState) {
-				context = new Context(cachedState, storage, client);
-				context.Register(request);
+			if (cacheResult.HasResult) {
+				context = new Context(cacheResult.Result, storage, client);
 			} else {
 				var isUserExist = context.UserService.IsUserExist(userId);
 				if (isUserExist) {
 					var memberState = new MemberState();
-					userStates.TryAdd(userId, memberState);
-					context.TransitionTo(memberState);
+					storage.SetUserState(userId, memberState);
+					context.TransitionTo(memberState, userId);
 				}
 			}
 
@@ -58,7 +57,7 @@
 		private static void HandleCommand(MessageEventArgs request, Context context, Commands command) {
 			switch (command) {
 				case Commands.Unknown:
-					context.Register(request);
+					context.Handle(request);
 					break;
 				case Commands.Help:
 					context.Help(request);

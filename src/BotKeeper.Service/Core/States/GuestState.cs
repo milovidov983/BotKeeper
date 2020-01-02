@@ -18,6 +18,11 @@ namespace BotKeeper.Service.Core.States {
             // do nothing
         }
 
+        public override void Register(MessageEventArgs messageEventArgs) {
+            context.Sender.Send("Enter your name:", messageEventArgs);
+            context.TransitionTo(new RegisterState(), messageEventArgs.Message.Chat.Id);
+        }
+
         public override void ShowHelp(MessageEventArgs messageEventArgs) {
             context.Sender.Send("Guest help information...",messageEventArgs);
         }

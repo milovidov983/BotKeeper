@@ -17,6 +17,9 @@ namespace BotKeeper.Service.Core.States {
 			context.Sender.Send("Login VerifiedUser!", messageEventArgs);
 		}
 
+		public override void Register(MessageEventArgs messageEventArgs) {
+		}
+
 		public override void ShowHelp(MessageEventArgs messageEventArgs) {
 			context.Sender.Send("Help VerifiedUser!", messageEventArgs);
 		}

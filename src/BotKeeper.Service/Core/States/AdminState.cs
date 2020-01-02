@@ -18,6 +18,10 @@ namespace BotKeeper.Service.Core.States {
             context.Sender.Send("You are login yet Admin!", messageEventArgs);
         }
 
+        public override void Register(MessageEventArgs messageEventArgs) {
+
+        }
+
         public override void ShowHelp(MessageEventArgs messageEventArgs) {
             context.Sender.Send("Admin help information...",messageEventArgs);
         }

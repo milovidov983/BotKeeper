@@ -21,13 +21,13 @@ namespace BotKeeper.Service.Core.States {
             var user = context.UserService.Get(messageEventArgs.Message.Chat.Id);
             if(user.Secret == password.Hash()) {
                 context.Sender.Send($"Welcome {user.Name}!", messageEventArgs);
-                context.TransitionTo(new VerifiedUserState());
+                context.TransitionTo(new VerifiedUserState(), messageEventArgs.Message.Chat.Id);
             } else {
                 var hasAttempt = AnyAttempts(user);
                 if (hasAttempt) {
                     context.Sender.Send("Wrong password, try again: ", messageEventArgs);
                 } else {
-                    context.TransitionTo(new GuestState());
+                    context.TransitionTo(new GuestState(), messageEventArgs.Message.Chat.Id);
                 }
             }
         }
@@ -40,5 +40,8 @@ namespace BotKeeper.Service.Core.States {
             context.Sender.Send("Login help information", messageEventArgs);
         }
 
+        public override void Register(MessageEventArgs messageEventArgs) {
+           
+        }
     }
 }

@@ -9,29 +9,61 @@ using BotKeeper.Service.Interfaces;
 using BotKeeper.Service.Core.Models.Users;
 using BotKeeper.Service.Core.Models;
 using System.Linq;
+using BotKeeper.Service.Core;
+using BotKeeper.Service.Core.States;
+using BotKeeper.Service.Core.interfaces;
 
 namespace BotKeeper.Service.Persistence.Db {
+
+
+	internal class StorageResult<T> : IStorageResult<T> {
+		private T result;
+		private bool hasResult;
+		public bool HasResult { get { return hasResult; } set { hasResult = value; } }
+		public T Result { 
+			get {
+				return result;
+			}
+			set {
+				result = value;
+				hasResult = true;
+			} 
+		}
+	}
+
 	internal class Storage : IStorage, IDisposable {
 		/// <summary>
 		/// Users stores
 		/// </summary>
-		private ConcurrentDictionary<int, ConcurrentDictionary<string, string>> storage =
-			new ConcurrentDictionary<int, ConcurrentDictionary<string, string>>();
+		private ConcurrentDictionary<long, ConcurrentDictionary<string, string>> storage =
+			new ConcurrentDictionary<long, ConcurrentDictionary<string, string>>();
 		/// <summary>
 		/// Users db
 		/// </summary>
-		private ConcurrentDictionary<int, IPersistedUser> users = new ConcurrentDictionary<int, IPersistedUser>();
-		private HashSet<int> userCachedIds = new HashSet<int>();
+		private ConcurrentDictionary<long, IPersistedUser> users = new ConcurrentDictionary<long, IPersistedUser>();
+		private HashSet<long> userCachedIds = new HashSet<long>();
 
 		/// <summary>
 		/// Session db
 		/// </summary>
-		private ConcurrentDictionary<int, IInteraction> sessions = new ConcurrentDictionary<int, IInteraction>();
+		private ConcurrentDictionary<long, IInteraction> sessions = new ConcurrentDictionary<long, IInteraction>();
+
+		private ConcurrentDictionary<long, State> userStates = new ConcurrentDictionary<long, State>();
 
 
 
+		public IStorageResult<State> GetUserState(long id) {
+			var isCachedState = userStates.TryGetValue(id, out var cachedState);
+			if (isCachedState) {
+				return new StorageResult<State> { Result = cachedState };
+			}
+			return new StorageResult<State>();
+		}
+		public void SetUserState(long id, State state) {
+			userStates.AddOrUpdate(id, state, (_, oldState) => state);
+		}
 
-		public async Task<T> Get<T>(int userId, string key) {
+		public async Task<T> Get<T>(long userId, string key) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
 				var isGetStatusOk = userStorage.TryGetValue(key, out var json);
@@ -46,7 +78,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 		}
 
-		public async Task Save<T>(int userId, string key, T value) {
+		public async Task Save<T>(long userId, string key, T value) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
 				var json = JsonConvert.SerializeObject(value);
@@ -61,7 +93,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 		}
 
-		public async Task Save(int userId) {
+		public async Task Save(long userId) {
 			await Task.Yield();
 			var isUserAdded = await CreateNewUser(userId);
 
@@ -76,12 +108,12 @@ namespace BotKeeper.Service.Persistence.Db {
 			
 		}
 
-		public async Task<IEnumerable<int>> GetAllUserIds() {
+		public async Task<IEnumerable<long>> GetAllUserIds() {
 			await Task.Yield();
 			return storage.Keys;
 		}
 
-		public async Task<IEnumerable<string>> GetAllKeys(int userId) {
+		public async Task<IEnumerable<string>> GetAllKeys(long userId) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
 				return userStorage.Keys;
@@ -90,11 +122,11 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 		}
 
-		public bool IsUserExist(int id) {
+		public bool IsUserExist(long id) {
 			return userCachedIds.Contains(id);
 		}
 
-		public async Task<IPersistedUser> GetUser(int id) {
+		public async Task<IPersistedUser> GetUser(long id) {
 			await Task.Yield();
 			if (users.TryGetValue(id, out var persistedUser)) {
 				return persistedUser;
@@ -103,7 +135,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 		}
 
-		public async Task<IInteraction> GetSession(int userId) {
+		public async Task<IInteraction> GetSession(long userId) {
 			await Task.Yield();
 			if (sessions.TryGetValue(userId, out var session)) {
 				return session;
@@ -114,10 +146,10 @@ namespace BotKeeper.Service.Persistence.Db {
 		}
 
 		#region Helpers
-		private async Task<bool> CreateNewUser(int id) {
+		private async Task<bool> CreateNewUser(long id) {
 			await Task.Yield();
 			var newUser = new PersistedUser {
-				Id = id,
+				Id = (int)id,
 				Data = string.Empty,
 				Type = UserTypes.New
 			};
@@ -128,7 +160,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			return false;
 		}
 
-		private async Task<bool> CreateUserStorage(int userId) {
+		private async Task<bool> CreateUserStorage(long userId) {
 			await Task.Yield();
 			return storage.TryAdd(userId, new ConcurrentDictionary<string, string>());
 		}
@@ -160,9 +192,9 @@ namespace BotKeeper.Service.Persistence.Db {
 			var usersDb = File.ReadAllText(fileUsers);
 			var sessionsDb = File.ReadAllText(fileSessions);
 
-			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<int, ConcurrentDictionary<string, string>>>(data);
-			users = JsonConvert.DeserializeObject<ConcurrentDictionary<int, IPersistedUser>>(usersDb);
-			sessions = JsonConvert.DeserializeObject<ConcurrentDictionary<int, IInteraction>>(sessionsDb);
+			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<long, ConcurrentDictionary<string, string>>>(data);
+			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, IPersistedUser>>(usersDb);
+			sessions = JsonConvert.DeserializeObject<ConcurrentDictionary<long, IInteraction>>(sessionsDb);
 			userCachedIds = users.Keys.Select(id => id).ToHashSet();
 		}
 
