@@ -1,4 +1,5 @@
 ﻿using BotKeeper.Service.Core.Helpers;
+using BotKeeper.Service.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,8 +7,9 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
     internal class LoginState : State {
+        private Dictionary<long, int> count = new Dictionary<long, int>();
         public override void Handle(MessageEventArgs messageEventArgs) {
-            throw new NotImplementedException();
+            Login(messageEventArgs);
         }
 
         public override void Initial(MessageEventArgs messageEventArgs) {
@@ -18,10 +20,20 @@ namespace BotKeeper.Service.Core.States {
 
             var user = context.UserService.Get(messageEventArgs.Message.Chat.Id);
             if(user.Secret == password.Hash()) {
-                // transite to user type state
+                context.Sender.Send($"Welcome {user.Name}!", messageEventArgs);
+                context.TransitionTo(new VerifiedUserState());
             } else {
-                context.Sender.Send("Wrong password, try again: ",messageEventArgs);
+                var hasAttempt = AnyAttempts(user);
+                if (hasAttempt) {
+                    context.Sender.Send("Wrong password, try again: ", messageEventArgs);
+                } else {
+                    context.TransitionTo(new GuestState());
+                }
             }
+        }
+
+        private bool AnyAttempts(User user) {
+            return true;
         }
 
         public override void ShowHelp(MessageEventArgs messageEventArgs) {

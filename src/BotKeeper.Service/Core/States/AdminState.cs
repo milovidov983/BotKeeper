@@ -7,7 +7,7 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.States {
     internal class AdminState : State {
         public override void Handle(MessageEventArgs messageEventArgs) {
-            throw new NotImplementedException();
+            context.Sender.Send("Handle Admin!", messageEventArgs);
         }
 
         public override void Initial(MessageEventArgs messageEventArgs) {

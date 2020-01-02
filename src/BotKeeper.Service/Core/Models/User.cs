@@ -12,5 +12,6 @@ namespace BotKeeper.Service.Core.Models {
         public long Id { get; set; }
         public UserType Type { get; set; }
         public string Secret { get; set; }
+        public string Name { get; set; }
     }
 }

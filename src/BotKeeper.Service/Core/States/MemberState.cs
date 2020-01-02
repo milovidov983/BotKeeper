@@ -8,7 +8,7 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.States {
     class MemberState : State {
         public override void Handle(MessageEventArgs messageEventArgs) {
-            throw new NotImplementedException();
+            context.Sender.Send("Handle Member!", messageEventArgs);
         }
 
         public override void Initial(MessageEventArgs messageEventArgs) {

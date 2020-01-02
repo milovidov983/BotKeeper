@@ -3,7 +3,8 @@
     using BotKeeper.Service.Core.States;
     using BotKeeper.Service.Interfaces;
 	using System;
-	using Telegram.Bot;
+    using System.Collections.Concurrent;
+    using Telegram.Bot;
 	using Telegram.Bot.Args;
 	internal class ApplicationBot {
 
@@ -26,15 +27,51 @@
 			client.StopReceiving();
 		}
 
-		private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs) {
-			var context = new Context(new GuestState(), storage, client);
+		private ConcurrentDictionary<long, State> userStates = new ConcurrentDictionary<long, State>();
 
-			var isUserExist = context.UserService.IsUserExist(messageEventArgs.Message.Chat.Id);
-			if (isUserExist) {
-				context.TransitionTo(new MemberState());
+		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
+			var userId = request.Message.Chat.Id;
+			var isCachedState = userStates.TryGetValue(userId, out var cachedState);
+
+			Context context = new Context(new GuestState(), storage, client);
+			if (isCachedState) {
+				context = new Context(cachedState, storage, client);
+				context.Register(request);
+			} else {
+				var isUserExist = context.UserService.IsUserExist(userId);
+				if (isUserExist) {
+					var memberState = new MemberState();
+					userStates.TryAdd(userId, memberState);
+					context.TransitionTo(memberState);
+				}
 			}
+			var command = ParseMessage(request.Message.Text);
+			switch (command) {
+				case Commands.Unknown:
+					context.Register(request);
+					break;
+				case Commands.Help:
+					context.Help(request);
+					break;
+				case Commands.Login:
+					context.Login(request);
+					break;
+				case Commands.Register:
+					context.Register(request);
+					break;
+				default: throw new Exception($"Unknown command {command.ToString()}");
+			}
+		}
 
-			context.InitialState(messageEventArgs);
+		private Commands ParseMessage(string text) {
+			throw new NotImplementedException();
+		}
+
+		enum Commands {
+			Unknown = 1,
+			Help,
+			Login,
+			Register
 		}
 	}
 }

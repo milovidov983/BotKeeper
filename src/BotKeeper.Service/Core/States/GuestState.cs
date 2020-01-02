@@ -7,7 +7,7 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.States {
     internal class GuestState : State {
         public override void Handle(MessageEventArgs messageEventArgs) {
-            throw new NotImplementedException();
+            Initial(messageEventArgs);
         }
 
         public override void Initial(MessageEventArgs messageEventArgs) {

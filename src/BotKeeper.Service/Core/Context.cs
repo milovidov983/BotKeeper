@@ -45,8 +45,12 @@ namespace BotKeeper.Service.Core {
             currentState.ShowHelp(messageEventArgs);
         }
 
-        public void Request2() {
-            //this._state.Handle2();
+        public void Register(MessageEventArgs messageEventArgs) {
+            currentState.Handle(messageEventArgs);
+        }
+
+        internal void Login(MessageEventArgs request) {
+            currentState.Login(request);
         }
     }
 }
