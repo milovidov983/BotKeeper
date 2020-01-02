@@ -31,6 +31,12 @@
 
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
 			var userId = request.Message.Chat.Id;
+			Context context = CreateContext(request, userId);
+			var command = ParseMessage(request.Message.Text);
+			HandleCommand(request, context, command);
+		}
+
+		private Context CreateContext(MessageEventArgs request, long userId) {
 			var isCachedState = userStates.TryGetValue(userId, out var cachedState);
 
 			Context context = new Context(new GuestState(), storage, client);
@@ -45,7 +51,11 @@
 					context.TransitionTo(memberState);
 				}
 			}
-			var command = ParseMessage(request.Message.Text);
+
+			return context;
+		}
+
+		private static void HandleCommand(MessageEventArgs request, Context context, Commands command) {
 			switch (command) {
 				case Commands.Unknown:
 					context.Register(request);
@@ -64,7 +74,13 @@
 		}
 
 		private Commands ParseMessage(string text) {
-			throw new NotImplementedException();
+			return (text?.Trim()?.ToLowerInvariant()) switch
+			{
+				@"\help" => Commands.Help,
+				@"\login" => Commands.Login,
+				@"\register" => Commands.Register,
+				_ => Commands.Unknown,
+			};
 		}
 
 		enum Commands {
