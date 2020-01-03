@@ -7,7 +7,6 @@ namespace BotKeeper.Service {
 	using Telegram.Bot;
 
 	class Program {
-
 		static async Task Main(string[] args) {
 			Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -16,7 +15,6 @@ namespace BotKeeper.Service {
 				e.Cancel = true;
 				exitEvent.Set();
 			};
-
 
 			var logger = Settings.Logger;
 			logger.Info("Service starting...");
@@ -32,6 +30,8 @@ namespace BotKeeper.Service {
 
 				logger.Info("Service started.");
 				exitEvent.WaitOne();
+
+				app.Stop();
 				logger.Info("Service stoped.");
 			} catch(Exception e) {
 				logger.Error(e);

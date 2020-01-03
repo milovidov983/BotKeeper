@@ -1,4 +1,4 @@
-﻿using BotKeeper.Service.Core.interfaces;
+﻿using BotKeeper.Service.Core.Interfaces;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
@@ -12,12 +12,18 @@ namespace BotKeeper.Service.Core {
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
 
-        public Context(State state, IServiceFactory serviceFactory) {
-            TransitionTo(state);
+        public Context(State state, IServiceFactory serviceFactory, long? userId = null) {
             storage = serviceFactory.Storage;
             UserService = serviceFactory.UserService;
             Sender = serviceFactory.Sender;
             ParserService = serviceFactory.ParserService;
+
+
+            if (userId.HasValue) {
+                TransitionToAsync(state, userId.Value).GetAwaiter().GetResult();
+            } else {
+                TransitionTo(state);
+            }
         }
 
         private void TransitionTo(State state) {
@@ -26,14 +32,9 @@ namespace BotKeeper.Service.Core {
         }
 
 
-        public async Task TransitionToAsync(State state, long? userId = null) {
-            if(currentState == state) {
-                return;
-            }
+        public async Task TransitionToAsync(State state, long userId) {
             currentState = state;
-            if (userId.HasValue) {
-                await storage.SetUserState(userId.Value, state);
-            }
+            await storage.SetUserState(userId, state);
             currentState.SetContext(this);
         }
 
@@ -54,6 +55,10 @@ namespace BotKeeper.Service.Core {
 
         public async Task Login(MessageEventArgs request) {
             await currentState.Login(request);
+        }
+
+        public async Task Save(MessageEventArgs request) {
+            await currentState.Save(request);
         }
     }
 }

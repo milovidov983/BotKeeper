@@ -17,20 +17,6 @@ namespace BotKeeper.Service.Core.States {
 
         public override async Task Login(MessageEventArgs request) {
             await Task.Yield();
-            //var password = request.Message.Text.Trim();
-
-            //var user = context.UserService.Get(request.Message.From.Id);
-            //if (user.Secret == password.Hash()) {
-            //    context.Sender.Send($"Welcome {user.Name}!", request);
-            //    context.TransitionTo(new VerifiedUserState());
-            //} else {
-            //    var hasAttempt = AnyAttempts(user);
-            //    if (hasAttempt) {
-            //        context.Sender.Send("Wrong password, try again: ", request);
-            //    } else {
-            //        context.TransitionTo(new GuestState());
-            //    }
-            //}
         }
 
         public override async Task ShowHelp(MessageEventArgs request) {
@@ -41,6 +27,18 @@ namespace BotKeeper.Service.Core.States {
         public override async Task Register(MessageEventArgs request) {
             await Task.Yield();
 
+        }
+
+        public override async Task Save(MessageEventArgs request) {
+            await Task.Yield();
+        }
+
+        public override Task Yes(MessageEventArgs request) {
+            throw new NotImplementedException();
+        }
+
+        public override Task No(MessageEventArgs request) {
+            throw new NotImplementedException();
         }
     }
 }

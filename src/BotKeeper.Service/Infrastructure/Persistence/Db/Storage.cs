@@ -6,7 +6,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
 using BotKeeper.Service.Core;
-using BotKeeper.Service.Core.interfaces;
+using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Core.Models;
 
 namespace BotKeeper.Service.Persistence.Db {
@@ -37,26 +37,30 @@ namespace BotKeeper.Service.Persistence.Db {
 		/// <summary>
 		/// Users db
 		/// </summary>
-		private ConcurrentDictionary<long, IPersistedUser> users = new ConcurrentDictionary<long, IPersistedUser>();
+		private ConcurrentDictionary<long, PersistedUser> users = new ConcurrentDictionary<long, PersistedUser>();
 
 		/// <summary>
 		/// Users sates
 		/// </summary>
-		private ConcurrentDictionary<long, State> userStates = new ConcurrentDictionary<long, State>();
+		private ConcurrentDictionary<long, string> userStates = new ConcurrentDictionary<long, string>();
+
+		public Storage() {
+			LoadDb();
+		}
 
 
 		#region Data access methods
-		public async Task<IStorageResult<State>> GetUserState(long id) {
+		public async Task<IStorageResult<string>> GetUserState(long id) {
 			await Task.Yield();
 			var hasCache = userStates.TryGetValue(id, out var cachedState);
 			if (hasCache) {
-				return new StorageResult<State> { Result = cachedState };
+				return new StorageResult<string> { Result = cachedState };
 			}
-			return new StorageResult<State>();
+			return new StorageResult<string>();
 		}
 		public async Task SetUserState(long id, State state) {
 			await Task.Yield();
-			userStates.AddOrUpdate(id, state, (_, oldState) => state);
+			userStates.AddOrUpdate(id, state.GetType().Name, (_, oldState) => state.GetType().Name);
 		}
 
 		public async Task<IStorageResult<T>> Get<T>(long userId, string key) {
@@ -120,12 +124,12 @@ namespace BotKeeper.Service.Persistence.Db {
 			return users.ContainsKey(id);
 		}
 
-		public async Task<IStorageResult<IPersistedUser>> GetUser(long id) {
+		public async Task<IStorageResult<PersistedUser>> GetUser(long id) {
 			await Task.Yield();
 			if (users.TryGetValue(id, out var persistedUser)) {
-				return new StorageResult<IPersistedUser> { Result = persistedUser };
+				return new StorageResult<PersistedUser> { Result = persistedUser };
 			}
-			return new StorageResult<IPersistedUser>();
+			return new StorageResult<PersistedUser>();
 		}
 
 		#endregion
@@ -133,7 +137,7 @@ namespace BotKeeper.Service.Persistence.Db {
 		#region Helpers
 		private async Task<bool> CreateNewUser(long id) {
 			await Task.Yield();
-			var newUser = new IPersistedUser {
+			var newUser = new PersistedUser {
 				Id = (int)id,
 				Type = UserType.Guest
 			};
@@ -173,8 +177,8 @@ namespace BotKeeper.Service.Persistence.Db {
 			var userStatesJson = File.ReadAllText(fileUserStates);
 
 			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<long, ConcurrentDictionary<string, string>>>(userDbJson);
-			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, IPersistedUser>>(usersJson);
-			userStates = JsonConvert.DeserializeObject<ConcurrentDictionary<long, State>>(userStatesJson);
+			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, PersistedUser>>(usersJson);
+			userStates = JsonConvert.DeserializeObject<ConcurrentDictionary<long, string>>(userStatesJson);
 		}
 
 		#endregion
@@ -182,6 +186,5 @@ namespace BotKeeper.Service.Persistence.Db {
 		public void Dispose() {
 			SaveDbToFileSystem().GetAwaiter().GetResult();
 		}
-
 	}
 }

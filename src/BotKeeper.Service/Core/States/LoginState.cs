@@ -2,7 +2,6 @@
 using BotKeeper.Service.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
@@ -21,15 +20,15 @@ namespace BotKeeper.Service.Core.States {
             var password = request.Message.Text.Trim();
 
             var user = await context.UserService.Get(request.Message.From.Id);
-            if(user.Secret == password.Hash()) {
+            if(user.Secret == password.GetHash()) {
                 context.Sender.Send($"Welcome {user.Name}!", request);
-                await context.TransitionToAsync(new VerifiedUserState(), request.Message.From.Id);
+                await context.TransitionToAsync(new MemberState(), request.Message.From.Id);
             } else {
                 var hasAttempt = AnyAttempts(user);
                 if (hasAttempt) {
                     context.Sender.Send("Wrong password, try again: ", request);
                 } else {
-                    await context.TransitionToAsync(new GuestState(), request.Message.From.Id);
+                    await context.TransitionToAsync(new DefaultState(), request.Message.From.Id);
                 }
             }
         }
@@ -46,6 +45,18 @@ namespace BotKeeper.Service.Core.States {
         public override async Task Register(MessageEventArgs request) {
             await Task.Yield();
 
+        }
+
+        public override async Task Save(MessageEventArgs request) {
+            await Task.Yield();
+        }
+
+        public override Task Yes(MessageEventArgs request) {
+            throw new NotImplementedException();
+        }
+
+        public override Task No(MessageEventArgs request) {
+            throw new NotImplementedException();
         }
     }
 }

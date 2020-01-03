@@ -1,15 +1,27 @@
-﻿using BotKeeper.Service.Core.interfaces;
+﻿using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Core.Models;
 using System;
 using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Core.Services {
 	internal class UserService : IUserService {
-		private IStorage storage;
+		private readonly IStorage storage;
+		private readonly ILogger logger;
 
-		public UserService(IStorage storage) {
+		public UserService(IStorage storage, ILogger logger) {
 			this.storage = storage 
 				?? throw new ArgumentNullException(nameof(storage));
+			this.logger = logger;
+		}
+
+		public async Task<bool> CreateNewAccount(int userId) {
+			try {
+				await storage.Save(userId);
+				return true;
+			} catch (StorageException e) {
+				logger.Error(e);
+			}
+			return false;
 		}
 
 		public async Task<User> Get(long id) {

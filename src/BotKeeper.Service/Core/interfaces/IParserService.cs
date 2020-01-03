@@ -1,7 +1,7 @@
 ﻿using BotKeeper.Service.Core.Models;
 
-namespace BotKeeper.Service.Core.interfaces {
+namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IParserService {
-		Commands ParseMessage(string text);
+		Commands Parse(string text);
 	}
 }

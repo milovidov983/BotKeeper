@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BotKeeper.Service.Core.interfaces {
+namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IValidationService {
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.Helpers {
 	public  static class Ext {
@@ -17,9 +18,8 @@ namespace BotKeeper.Service.Core.Helpers {
 		}
 
 
-		public static string Hash(this string value) {
+		public static string GetHash(this string value) {
 			return ComputeSha256Hash(value);
-
 		}
 
 
@@ -33,6 +33,10 @@ namespace BotKeeper.Service.Core.Helpers {
 				}
 				return builder.ToString();
 			}
+		}
+
+		public static long GetUserId(this MessageEventArgs messageEventArgs) {
+			return messageEventArgs.Message.From.Id;
 		}
 	}
 }

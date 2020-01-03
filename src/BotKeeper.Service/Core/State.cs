@@ -17,5 +17,8 @@ namespace BotKeeper.Service.Core {
         public abstract Task Login(MessageEventArgs request);
         public abstract Task Handle(MessageEventArgs request);
         public abstract Task Register(MessageEventArgs request);
+        public abstract Task Save(MessageEventArgs request);
+        public abstract Task Yes(MessageEventArgs request);
+        public abstract Task No(MessageEventArgs request);
     }
 }

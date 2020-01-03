@@ -18,7 +18,15 @@ namespace BotKeeper.Service.Core.States {
             await Task.Yield();
         }
 
+        public override Task No(MessageEventArgs request) {
+            throw new System.NotImplementedException();
+        }
+
         public override async Task Register(MessageEventArgs request) {
+            await Task.Yield();
+        }
+
+        public override async Task Save(MessageEventArgs request) {
             await Task.Yield();
         }
 
@@ -27,5 +35,8 @@ namespace BotKeeper.Service.Core.States {
             await Task.Yield();
         }
 
+        public override Task Yes(MessageEventArgs request) {
+            throw new System.NotImplementedException();
+        }
     }
 }
