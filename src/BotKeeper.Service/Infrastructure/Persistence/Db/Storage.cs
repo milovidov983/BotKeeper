@@ -4,14 +4,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
-using BotKeeper.Service.Models;
-using BotKeeper.Service.Interfaces;
-using BotKeeper.Service.Core.Models.Users;
-using BotKeeper.Service.Core.Models;
 using System.Linq;
 using BotKeeper.Service.Core;
-using BotKeeper.Service.Core.States;
 using BotKeeper.Service.Core.interfaces;
+using BotKeeper.Service.Core.Models;
 
 namespace BotKeeper.Service.Persistence.Db {
 
@@ -37,45 +33,42 @@ namespace BotKeeper.Service.Persistence.Db {
 		/// </summary>
 		private ConcurrentDictionary<long, ConcurrentDictionary<string, string>> storage =
 			new ConcurrentDictionary<long, ConcurrentDictionary<string, string>>();
+
 		/// <summary>
 		/// Users db
 		/// </summary>
 		private ConcurrentDictionary<long, IPersistedUser> users = new ConcurrentDictionary<long, IPersistedUser>();
-		private HashSet<long> userCachedIds = new HashSet<long>();
 
 		/// <summary>
-		/// Session db
+		/// Users sates
 		/// </summary>
-		private ConcurrentDictionary<long, IInteraction> sessions = new ConcurrentDictionary<long, IInteraction>();
-
 		private ConcurrentDictionary<long, State> userStates = new ConcurrentDictionary<long, State>();
 
 
-
-		public IStorageResult<State> GetUserState(long id) {
-			var isCachedState = userStates.TryGetValue(id, out var cachedState);
-			if (isCachedState) {
+		#region Data access methods
+		public async Task<IStorageResult<State>> GetUserState(long id) {
+			await Task.Yield();
+			var hasCache = userStates.TryGetValue(id, out var cachedState);
+			if (hasCache) {
 				return new StorageResult<State> { Result = cachedState };
 			}
 			return new StorageResult<State>();
 		}
-		public void SetUserState(long id, State state) {
+		public async Task SetUserState(long id, State state) {
+			await Task.Yield();
 			userStates.AddOrUpdate(id, state, (_, oldState) => state);
 		}
 
-		public async Task<T> Get<T>(long userId, string key) {
+		public async Task<IStorageResult<T>> Get<T>(long userId, string key) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
 				var isGetStatusOk = userStorage.TryGetValue(key, out var json);
 				if (isGetStatusOk) {
 					var value = JsonConvert.DeserializeObject<T>(json);
-					return value;
-				} else {
-					throw new StorageException("Key not found");
+					return new StorageResult<T> { Result = value };
 				}
-			} else {
-				throw new StorageException("User not found");
 			}
+			return new StorageResult<T>();
 		}
 
 		public async Task Save<T>(long userId, string key, T value) {
@@ -122,42 +115,29 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 		}
 
-		public bool IsUserExist(long id) {
-			return userCachedIds.Contains(id);
+		public async Task<bool> IsUserExist(long id) {
+			await Task.Yield();
+			return users.ContainsKey(id);
 		}
 
-		public async Task<IPersistedUser> GetUser(long id) {
+		public async Task<IStorageResult<IPersistedUser>> GetUser(long id) {
 			await Task.Yield();
 			if (users.TryGetValue(id, out var persistedUser)) {
-				return persistedUser;
-			} else {
-				throw new StorageException("User not found");
+				return new StorageResult<IPersistedUser> { Result = persistedUser };
 			}
+			return new StorageResult<IPersistedUser>();
 		}
 
-		public async Task<IInteraction> GetSession(long userId) {
-			await Task.Yield();
-			if (sessions.TryGetValue(userId, out var session)) {
-				return session;
-			} else {
-				//return new WelcomeInteraction();
-				throw new Exception("debug");
-			}
-		}
+		#endregion
 
 		#region Helpers
 		private async Task<bool> CreateNewUser(long id) {
 			await Task.Yield();
-			var newUser = new PersistedUser {
+			var newUser = new IPersistedUser {
 				Id = (int)id,
-				Data = string.Empty,
-				Type = UserTypes.New
+				Type = UserType.Guest
 			};
-			if (users.TryAdd(id, newUser)) {
-				userCachedIds.Add(id);
-				return true;
-			}
-			return false;
+			return users.TryAdd(id, newUser);
 		}
 
 		private async Task<bool> CreateUserStorage(long userId) {
@@ -170,32 +150,31 @@ namespace BotKeeper.Service.Persistence.Db {
 
 		private readonly string fileDb = @"db.json";
 		private readonly string fileUsers = @"users.json";
-		private readonly string fileSessions = @"sessions.json";
+		private readonly string fileUserStates = @"userStates.json";
 		public async Task SaveDbToFileSystem() {
-			var jsonDb = JsonConvert.SerializeObject(storage);
-			var jsonUsers = JsonConvert.SerializeObject(users);
-			var jsonSessions = JsonConvert.SerializeObject(sessions);
+			var dbJson = JsonConvert.SerializeObject(storage);
+			var usersJson = JsonConvert.SerializeObject(users);
+			var userStatesJson = JsonConvert.SerializeObject(userStates);
 
 			using StreamWriter dbSw = File.CreateText(fileDb);
 			using StreamWriter usersSw = File.CreateText(fileUsers);
-			using StreamWriter sessionsSw = File.CreateText(fileSessions);
+			using StreamWriter userStatesSw = File.CreateText(fileUserStates);
 
 			await Task.WhenAll(
-				dbSw.WriteLineAsync(jsonDb),
-				usersSw.WriteLineAsync(jsonUsers),
-				sessionsSw.WriteLineAsync(jsonSessions)
+				dbSw.WriteLineAsync(dbJson),
+				usersSw.WriteLineAsync(usersJson),
+				userStatesSw.WriteLineAsync(userStatesJson)
 			);
 		}
 
 		public void LoadDb() {
-			var data = File.ReadAllText(fileDb);
-			var usersDb = File.ReadAllText(fileUsers);
-			var sessionsDb = File.ReadAllText(fileSessions);
+			var userDbJson = File.ReadAllText(fileDb);
+			var usersJson = File.ReadAllText(fileUsers);
+			var userStatesJson = File.ReadAllText(fileUserStates);
 
-			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<long, ConcurrentDictionary<string, string>>>(data);
-			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, IPersistedUser>>(usersDb);
-			sessions = JsonConvert.DeserializeObject<ConcurrentDictionary<long, IInteraction>>(sessionsDb);
-			userCachedIds = users.Keys.Select(id => id).ToHashSet();
+			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<long, ConcurrentDictionary<string, string>>>(userDbJson);
+			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, IPersistedUser>>(usersJson);
+			userStates = JsonConvert.DeserializeObject<ConcurrentDictionary<long, State>>(userStatesJson);
 		}
 
 		#endregion

@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BotKeeper.Service.Models {
+namespace BotKeeper.Service.Core.Models {
 	internal class StorageException : Exception {
+		public StorageException() {
+		}
+
 		public StorageException(string message) : base(message) {
 		}
 

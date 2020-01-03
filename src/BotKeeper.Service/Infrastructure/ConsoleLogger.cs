@@ -1,10 +1,7 @@
-﻿using BotKeeper.Service.Interfaces;
-using BotKeeper.Service.Models;
+﻿using BotKeeper.Service.Core.interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BotKeeper.Service.Infrastructure {
 	internal class ConsoleLogger : ILogger {

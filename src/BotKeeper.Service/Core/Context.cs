@@ -1,62 +1,59 @@
-﻿using BotKeeper.Service.Core.Senders;
-using BotKeeper.Service.Core.Services;
-using BotKeeper.Service.Core.States;
-using BotKeeper.Service.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Telegram.Bot;
+﻿using BotKeeper.Service.Core.interfaces;
+using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
-	internal class Context {
+    internal class Context {
         private State currentState = null;
         private readonly IStorage storage;
-        private readonly TelegramBotClient client;
 
-        public ISender Sender;
-        public UserService UserService;
-        public ValidationService ValidationService;
+        public readonly ISender Sender;
+        public readonly IParserService ParserService;
+        public readonly IUserService UserService;
+        public readonly IValidationService ValidationService;
 
-
-        private static readonly object empty = new object();
-
-        public Context(State state, IStorage storage, TelegramBotClient client) {
+        public Context(State state, IServiceFactory serviceFactory) {
             TransitionTo(state);
-            this.storage = storage;
-            UserService = new UserService(storage);
-            Sender = new Sender(client);
+            storage = serviceFactory.Storage;
+            UserService = serviceFactory.UserService;
+            Sender = serviceFactory.Sender;
+            ParserService = serviceFactory.ParserService;
         }
 
-        public object TransitionTo(State state, long? userId = null) {
+        private void TransitionTo(State state) {
+            currentState = state;
+            currentState.SetContext(this);
+        }
+
+
+        public async Task TransitionToAsync(State state, long? userId = null) {
             if(currentState == state) {
-                return empty;
+                return;
             }
             currentState = state;
             if (userId.HasValue) {
-                storage.SetUserState(userId.Value, state);
+                await storage.SetUserState(userId.Value, state);
             }
             currentState.SetContext(this);
-            return empty;
         }
 
-        public void InitialState(MessageEventArgs messageEventArgs) {
-            currentState.Initial(messageEventArgs);
+        public async Task InitialState(MessageEventArgs request) {
+            await currentState.Initial(request);
         }
 
-        public void Help(MessageEventArgs messageEventArgs) {
-            currentState.ShowHelp(messageEventArgs);
+        public async Task ShowHelp(MessageEventArgs request) {
+            await currentState.ShowHelp(request);
         }
 
-        public void Register(MessageEventArgs messageEventArgs) {
-            //currentState.Register(messageEventArgs);
+        public async Task Register(MessageEventArgs request) {
+            await currentState.Register(request);
         }       
-        public void Handle(MessageEventArgs messageEventArgs) {
-            currentState.Handle(messageEventArgs);
+        public async Task Handle(MessageEventArgs request) {
+            await currentState.Handle(request);
         }
 
-        internal void Login(MessageEventArgs request) {
-            currentState.Login(request);
+        public async Task Login(MessageEventArgs request) {
+            await currentState.Login(request);
         }
     }
 }

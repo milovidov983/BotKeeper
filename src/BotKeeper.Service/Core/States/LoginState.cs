@@ -3,31 +3,33 @@ using BotKeeper.Service.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
     internal class LoginState : State {
         private Dictionary<long, int> count = new Dictionary<long, int>();
-        public override void Handle(MessageEventArgs messageEventArgs) {
-            Login(messageEventArgs);
+        public override async Task Handle(MessageEventArgs request) {
+            await Login(request);
         }
 
-        public override void Initial(MessageEventArgs messageEventArgs) {
+        public override async Task Initial(MessageEventArgs request) {
+            await Task.Yield();
         }
 
-        public override void Login(MessageEventArgs messageEventArgs) {
-            var password = messageEventArgs.Message.Text.Trim();
+        public override async Task Login(MessageEventArgs request) {
+            var password = request.Message.Text.Trim();
 
-            var user = context.UserService.Get(messageEventArgs.Message.From.Id);
+            var user = await context.UserService.Get(request.Message.From.Id);
             if(user.Secret == password.Hash()) {
-                context.Sender.Send($"Welcome {user.Name}!", messageEventArgs);
-                context.TransitionTo(new VerifiedUserState(), messageEventArgs.Message.From.Id);
+                context.Sender.Send($"Welcome {user.Name}!", request);
+                await context.TransitionToAsync(new VerifiedUserState(), request.Message.From.Id);
             } else {
                 var hasAttempt = AnyAttempts(user);
                 if (hasAttempt) {
-                    context.Sender.Send("Wrong password, try again: ", messageEventArgs);
+                    context.Sender.Send("Wrong password, try again: ", request);
                 } else {
-                    context.TransitionTo(new GuestState(), messageEventArgs.Message.From.Id);
+                    await context.TransitionToAsync(new GuestState(), request.Message.From.Id);
                 }
             }
         }
@@ -36,12 +38,14 @@ namespace BotKeeper.Service.Core.States {
             return true;
         }
 
-        public override void ShowHelp(MessageEventArgs messageEventArgs) {
-            context.Sender.Send("Login help information", messageEventArgs);
+        public override async Task ShowHelp(MessageEventArgs request) {
+            context.Sender.Send("Login help information", request);
+            await Task.Yield();
         }
 
-        public override void Register(MessageEventArgs messageEventArgs) {
-           
+        public override async Task Register(MessageEventArgs request) {
+            await Task.Yield();
+
         }
     }
 }

@@ -1,16 +1,15 @@
 ﻿using BotKeeper.Service.Core.Helpers;
+using BotKeeper.Service.Core.interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 
-namespace BotKeeper.Service.Core.Senders {
-	internal class Sender : ISender {
+namespace BotKeeper.Service.Core.Services {
+	internal class SenderService : ISender {
 
 		private readonly TelegramBotClient client;
 
-		public Sender(TelegramBotClient client) {
+		public SenderService(TelegramBotClient client) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 		}
 		public void Send(string text, MessageEventArgs request) {

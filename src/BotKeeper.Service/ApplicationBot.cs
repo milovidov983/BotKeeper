@@ -1,7 +1,10 @@
 ﻿namespace BotKeeper.Service {
     using BotKeeper.Service.Core;
+    using BotKeeper.Service.Core.interfaces;
+    using BotKeeper.Service.Core.Models;
+    using BotKeeper.Service.Core.Services;
     using BotKeeper.Service.Core.States;
-    using BotKeeper.Service.Interfaces;
+
 	using System;
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
@@ -11,12 +14,15 @@
 
 		private readonly TelegramBotClient client;
 		private readonly IStorage storage;
-
+		private readonly IServiceFactory serviceFactory;
 		public ApplicationBot(
 			TelegramBotClient client,
 			IStorage storage) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 			this.storage = storage;
+			var sender = new SenderService(client);
+			serviceFactory = new ServiceFactory(storage, sender);
+
 		}
 
 		public void Run() {
@@ -30,45 +36,44 @@
 
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
 			var userId = request.Message.From.Id;
-			var context = CreateContext(userId);
+			var context = await CreateContext(userId);
 			var command = ParseMessage(request.Message.Text);
 
-			HandleCommand(request, context, command);
-			
-			await Task.Yield();
+			await HandleCommand(request, context, command);
+
 		}
 
-		private Context CreateContext(long userId) {
-			var cachedState = storage.GetUserState(userId);
+		private async Task<Context> CreateContext(long userId) {
+			var cachedState = await storage.GetUserState(userId);
 
-			var context = new Context(new GuestState(), storage, client);
+			var context = new Context(new GuestState(), serviceFactory);
 			if (cachedState.HasResult) {
-				return new Context(cachedState.Result, storage, client);
+				return new Context(cachedState.Result, serviceFactory);
 			} else {
-				var isUserExist = context.UserService.IsUserExist(userId);
+				var isUserExist = await context.UserService.IsUserExist(userId);
 				if (isUserExist) {
 					var memberState = new MemberState();
-					storage.SetUserState(userId, memberState);
-					context.TransitionTo(memberState, userId);
+					await storage.SetUserState(userId, memberState);
+					await context.TransitionToAsync(memberState, userId);
 				}
 			}
 
 			return context;
 		}
 
-		private static void HandleCommand(MessageEventArgs request, Context context, Commands command) {
+		private static async Task HandleCommand(MessageEventArgs request, Context context, Commands command) {
 			switch (command) {
 				case Commands.Unknown:
-					context.Handle(request);
+					await context.Handle(request);
 					break;
 				case Commands.Help:
-					context.Help(request);
+					await context.ShowHelp(request);
 					break;
 				case Commands.Login:
-					context.Login(request);
+					await context.Login(request);
 					break;
 				case Commands.Register:
-					context.Register(request);
+					await context.Register(request);
 					break;
 				default: throw new Exception($"Unknown command {command.ToString()}");
 			}
@@ -82,13 +87,6 @@
 				@"\register" => Commands.Register,
 				_ => Commands.Unknown,
 			};
-		}
-
-		enum Commands {
-			Unknown = 1,
-			Help,
-			Login,
-			Register
 		}
 	}
 }

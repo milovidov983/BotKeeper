@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
@@ -11,10 +12,10 @@ namespace BotKeeper.Service.Core {
             this.context = context;
         }
 
-        public abstract void ShowHelp(MessageEventArgs messageEventArgs);
-        public abstract void Initial(MessageEventArgs messageEventArgs);
-        public abstract void Login(MessageEventArgs messageEventArgs);
-        public abstract void Handle(MessageEventArgs messageEventArgs);
-        public abstract void Register(MessageEventArgs messageEventArgs);
+        public abstract Task ShowHelp(MessageEventArgs request);
+        public abstract Task Initial(MessageEventArgs request);
+        public abstract Task Login(MessageEventArgs request);
+        public abstract Task Handle(MessageEventArgs request);
+        public abstract Task Register(MessageEventArgs request);
     }
 }

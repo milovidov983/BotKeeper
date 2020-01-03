@@ -1,10 +1,8 @@
-﻿using BotKeeper.Service.Infrastructure;
-using BotKeeper.Service.Interfaces;
+﻿using BotKeeper.Service.Core.interfaces;
+using BotKeeper.Service.Infrastructure;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace BotKeeper.Service {
 	internal class Settings {
