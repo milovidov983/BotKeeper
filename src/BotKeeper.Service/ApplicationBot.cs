@@ -30,18 +30,20 @@
 
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
 			var userId = request.Message.From.Id;
-			Context context = CreateContext(request, userId);
+			var context = CreateContext(userId);
 			var command = ParseMessage(request.Message.Text);
+
 			HandleCommand(request, context, command);
+			
 			await Task.Yield();
 		}
 
-		private Context CreateContext(MessageEventArgs request, long userId) {
-			var cacheResult = storage.GetUserState(userId);
+		private Context CreateContext(long userId) {
+			var cachedState = storage.GetUserState(userId);
 
-			Context context = new Context(new GuestState(), storage, client);
-			if (cacheResult.HasResult) {
-				context = new Context(cacheResult.Result, storage, client);
+			var context = new Context(new GuestState(), storage, client);
+			if (cachedState.HasResult) {
+				return new Context(cachedState.Result, storage, client);
 			} else {
 				var isUserExist = context.UserService.IsUserExist(userId);
 				if (isUserExist) {

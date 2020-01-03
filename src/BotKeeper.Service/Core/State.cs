@@ -12,7 +12,6 @@ namespace BotKeeper.Service.Core {
         }
 
         public abstract void ShowHelp(MessageEventArgs messageEventArgs);
-
         public abstract void Initial(MessageEventArgs messageEventArgs);
         public abstract void Login(MessageEventArgs messageEventArgs);
         public abstract void Handle(MessageEventArgs messageEventArgs);

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.States {
-    class MemberState : State {
+    internal class MemberState : State {
         public override void Handle(MessageEventArgs messageEventArgs) {
             context.Sender.Send("Handle Member!", messageEventArgs);
         }

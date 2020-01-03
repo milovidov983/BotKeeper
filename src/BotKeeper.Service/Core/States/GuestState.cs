@@ -19,8 +19,14 @@ namespace BotKeeper.Service.Core.States {
         }
 
         public override void Register(MessageEventArgs messageEventArgs) {
-            context.Sender.Send("Enter your name:", messageEventArgs);
-            context.TransitionTo(new RegisterState(), messageEventArgs.Message.From.Id);
+            var accountIsFree = !context.UserService.IsUserExist(messageEventArgs.Message.From.Id);
+            if (accountIsFree) {
+                context.Sender.Send("Create a new password(minimum 12 characters):", messageEventArgs);
+                context.TransitionTo(new RegisterState(), messageEventArgs.Message.From.Id);
+            } else {
+                context.TransitionTo(new MemberState(), messageEventArgs.Message.From.Id);
+                context.Login(messageEventArgs);
+            }
         }
 
         public override void ShowHelp(MessageEventArgs messageEventArgs) {
