@@ -33,7 +33,7 @@ namespace BotKeeper.Service.Core.Factories {
 			if (stateMap.TryGetValue(stateName ?? string.Empty, out var stateCreator)) {
 				return stateCreator.Invoke();
 			}
-			logger.Warn($"Unknown state {stateName}. Request context {requestContext}.");
+			logger.Warn($"Unknown state {stateName}. {requestContext}");
 			return defaultState;
 		}
 	}

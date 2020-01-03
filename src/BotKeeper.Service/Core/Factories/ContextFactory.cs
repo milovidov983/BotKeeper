@@ -23,7 +23,7 @@ namespace BotKeeper.Service.Core.Factories {
 
 
 			if (storedUserState.HasResult) {
-				var storedState = stateFactory.CreateState(storedUserState.Result);
+				var storedState = stateFactory.CreateState(storedUserState.Result, $"user {userId}");
 				return new Context(storedState, serviceFactory);
 			} else {
 				var isUserExist = await userService.IsUserExist(userId);
