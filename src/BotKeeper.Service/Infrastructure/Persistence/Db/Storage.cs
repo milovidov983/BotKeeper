@@ -88,7 +88,7 @@ namespace BotKeeper.Service.Persistence.Db {
 					userStorage[key] = json;
 				}
 			} else {
-				throw new StorageException("User not found");
+				throw new BotException("User not found", StatusCodes.NotFound);
 			}
 		}
 
@@ -97,12 +97,12 @@ namespace BotKeeper.Service.Persistence.Db {
 			var isUserAdded = await CreateNewUser(userId);
 
 			if (!isUserAdded) {
-				throw new StorageException($"User {userId} already exists");
+				throw new BotException($"User {userId} already exists", StatusCodes.InvalidRequest);
 			}
 
 			var isUserStorageCreated = await CreateUserStorage(userId);
 			if (!isUserStorageCreated) {
-				throw new StorageException($"User storage {userId} already exists");
+				throw new BotException($"User storage {userId} already exists", StatusCodes.InvalidRequest);
 			}
 			
 		}
@@ -117,7 +117,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			if (storage.TryGetValue(userId, out var userStorage)) {
 				return userStorage.Keys;
 			} else {
-				throw new StorageException("User not found");
+				throw new BotException("User not found", StatusCodes.NotFound);
 			}
 		}
 

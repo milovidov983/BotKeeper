@@ -28,5 +28,12 @@ namespace BotKeeper.Service {
 			return attribute.InformationalVersion;
 			
 		}
+
+
+		public class Environments {
+			public const string Test = "test";
+			public const string Develop = "develop";
+			public const string Production = "production";
+		}
 	}
 }

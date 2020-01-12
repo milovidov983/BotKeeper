@@ -4,54 +4,19 @@ using System;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class MetricsFactory : IMetricsFactory {
-		private IMetricsService metricsService;
-		private readonly string env;
-		private readonly ILogger logger;
+		private readonly FactoryHelper<IMetricsService> helper;
 
 		public MetricsFactory(string env, ILogger logger) {
-			this.env = env;
-			this.logger = logger;
+			var defaultService = new TestMetricsService();
+			helper = new FactoryHelper<IMetricsService>(defaultService, logger, env);
+
+			helper.InitFactory(Settings.Environments.Test, defaultService);
+			helper.InitFactory(Settings.Environments.Develop, defaultService);
+			helper.InitFactory(Settings.Environments.Production, new ProdMetricsService());
 		}
 
-		public IMetricsService CreateMetricsService() {
-			if (metricsService is null) {
-				metricsService = Create();
-			}
-			return metricsService;
-		}
-
-		private IMetricsService Create() {
-			return env switch
-			{
-				"test" => new TestMetricsService(),
-				"prod" => new ProdMetricsService(),
-				"develop" => new TestMetricsService(),
-				_ =>  CreateDefaultMetricsService()
-				
-			};
-		}
-
-		private IMetricsService CreateDefaultMetricsService() {
-			var defaultMetricsService = new TestMetricsService();
-			LogDefaultCreation(defaultMetricsService);
-
-			return new TestMetricsService();
-		}
-
-		private void LogDefaultCreation(IMetricsService defaultMetricsService) {
-			var defaultMetricsServiceType = defaultMetricsService.GetType();
-			var mainLogInfo = $"Default metrics service ( {defaultMetricsServiceType.Name} ) selected. ";
-
-			var additionalLogMessage = IsEnvVariableNotSet()
-				? $"Env( {nameof(Settings)}.{nameof(Settings.Instance.Env)} <-- ) variable not set."
-				: $"Env( {nameof(Settings)}.{nameof(Settings.Instance.Env)} <-- ) variable has an invalid value: [ {env} <-- ]";
-
-
-			logger.Warn(mainLogInfo + additionalLogMessage);
-		}
-
-		private bool IsEnvVariableNotSet() {
-			return string.IsNullOrEmpty(env);
+		public IMetricsService Create() {
+			return helper.CreateService();
 		}
 	}
 }

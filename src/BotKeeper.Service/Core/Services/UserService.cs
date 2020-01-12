@@ -15,13 +15,8 @@ namespace BotKeeper.Service.Core.Services {
 		}
 
 		public async Task<bool> CreateNewAccount(int userId) {
-			try {
-				await storage.Save(userId);
-				return true;
-			} catch (StorageException e) {
-				logger.Error(e);
-			}
-			return false;
+			await storage.Save(userId);
+			return true;
 		}
 
 		public async Task<User> Get(long id) {

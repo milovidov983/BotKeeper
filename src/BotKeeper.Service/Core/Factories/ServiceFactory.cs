@@ -9,6 +9,7 @@ namespace BotKeeper.Service.Core.Services {
 		private readonly IUserService userService;
 		private readonly ISender sender;
 		private readonly IContextFactory contextFactory;
+		private readonly IEmegencyService emegencyService;
 
 		public IStratagyRepository HandlerFactory => parserService;
 		public IUserService UserService => userService;
@@ -16,6 +17,7 @@ namespace BotKeeper.Service.Core.Services {
 		public ISender Sender => sender;
 		public ILogger Logger => logger;
 		public IContextFactory ContextFactory => contextFactory;
+		public IEmegencyService EmegencyService => emegencyService;
 
 		public ServiceFactory(IStorage storage, ISender sender, ILogger logger) {
 			this.sender = sender;
@@ -27,6 +29,9 @@ namespace BotKeeper.Service.Core.Services {
 
 			var stateFactory = new StateFactory(logger);
 			contextFactory = new ContextFactory(storage, userService, stateFactory, this);
+
+			var emegencyServiceFactory = new EmegencyServiceFactory(Settings.Instance.Env, logger, sender);
+			emegencyService = emegencyServiceFactory.Create();
 		}
 	}
 }

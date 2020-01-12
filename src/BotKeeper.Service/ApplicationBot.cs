@@ -18,17 +18,19 @@
 		private readonly IStratagyRepository handlerFactory;
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
+		private readonly IEmegencyService emegencyService;
 
 		public ApplicationBot(TelegramBotClient client, IStorage storage) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 
 			var metricFactory = new MetricsFactory(Settings.Instance.Env, Settings.Logger);
-			var metricService = metricFactory.CreateMetricsService();
+			var metricService = metricFactory.Create();
 			var sender = new SenderService(client, metricService);
 
 			serviceFactory = new ServiceFactory(storage, sender, Settings.Logger);
 			handlerFactory = serviceFactory.HandlerFactory;
 			contextFactory = serviceFactory.ContextFactory;
+			emegencyService = serviceFactory.EmegencyService;
 
 			logger = Settings.Logger;
 		}
@@ -64,14 +66,14 @@
 			logger.Trace($"Message failed {request.Message.Text}");
 		}
 
-
-
-		private void OnError(MessageEventArgs request, BotException ex) {
+		private void  OnError(MessageEventArgs request, BotException ex) {
 			if (ex.StatusCode == StatusCodes.InternalError) {
 				logger.Error(ex, request.ToJson());
 			} else {
 				logger.Warn(ex, request.ToJson());
 			}
+
+			emegencyService.SendErrorMessage(request, ex);
 
 			/// Some additional logic
 		}

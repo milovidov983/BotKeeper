@@ -9,5 +9,6 @@ namespace BotKeeper.Service.Core.Interfaces {
 		IUserService UserService { get; }
 		ILogger Logger { get; }
 		IContextFactory ContextFactory { get; }
+		IEmegencyService EmegencyService { get; }
 	}
 }

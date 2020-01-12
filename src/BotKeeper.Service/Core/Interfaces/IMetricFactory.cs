@@ -2,6 +2,6 @@
 
 namespace BotKeeper.Service.Core.Factories {
 	internal interface IMetricsFactory {
-		IMetricsService CreateMetricsService();
+		IMetricsService Create();
 	}
 }
