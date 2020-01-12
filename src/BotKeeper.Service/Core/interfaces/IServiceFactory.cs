@@ -6,7 +6,6 @@ namespace BotKeeper.Service.Core.Interfaces {
 		ISender Sender { get; }
 		IStorage Storage { get; }
 		IUserService UserService { get; }
-		IHandlerService HandlerService { get; }
 		ILogger Logger { get; }
 		IContextFactory ContextFactory { get; }
 	}

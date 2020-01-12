@@ -17,7 +17,7 @@ namespace BotKeeper.Service.Core.Services {
         //	{ @"\register", Commands.Register }
         //};
 
-        public IHandlerClient CreateHandlerForCommand(string text) {
+        public IHandlerClient GetHandlerForCommand(string text) {
             var userCommand = text?.Trim()?.ToLowerInvariant() ?? string.Empty;
 
             if (commandHandlersMap.TryGetValue(userCommand, out var handlerClient)) {
@@ -27,16 +27,7 @@ namespace BotKeeper.Service.Core.Services {
             return new EmptyHandler();
         }
 
-        private async static Task<bool> EmptyHandler(HandlerDto dto) {
-            await Task.Yield();
-            return false;
-        }
 
-        public class HandlerDto {
-            public MethodInfo handler;
-            public Context context;
-            public MessageEventArgs request;
-        }
         protected static Dictionary<string, IHandlerClient> commandHandlersMap = new Dictionary<string, IHandlerClient>();
 
         /// <summary>
@@ -58,17 +49,13 @@ namespace BotKeeper.Service.Core.Services {
             return commandHandlersMap;
         }
 
-        /// <summary>
-        ///  Return not function 
-        ///  class
-        /// </summary>
         protected static IHandlerClient CreateHandlerClient(MethodInfo handler) {
             return new HandlerClient(handler);
         }
     }
 
     internal class HandlerClient : IHandlerClient {
-        MethodInfo handler;
+        private readonly MethodInfo handler;
 
         public HandlerClient(MethodInfo handler) {
             this.handler = handler ?? throw new ArgumentNullException(nameof(handler));

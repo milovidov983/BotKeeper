@@ -2,6 +2,6 @@
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IHandlerFactory {
-		IHandlerClient CreateHandlerForCommand(string commandText);
+		IHandlerClient GetHandlerForCommand(string commandText);
 	}
 }

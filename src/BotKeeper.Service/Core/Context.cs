@@ -9,7 +9,7 @@ namespace BotKeeper.Service.Core {
         private readonly IStorage storage;
 
         public readonly ISender Sender;
-        public readonly IHandlerFactory ParserService;
+        public readonly IHandlerFactory HandlerFactory;
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
 
@@ -17,7 +17,7 @@ namespace BotKeeper.Service.Core {
             storage = serviceFactory.Storage;
             UserService = serviceFactory.UserService;
             Sender = serviceFactory.Sender;
-            ParserService = serviceFactory.ParserService;
+            HandlerFactory = serviceFactory.HandlerFactory;
 
 
             if (userId.HasValue) {
