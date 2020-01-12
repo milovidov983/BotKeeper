@@ -13,11 +13,12 @@ using Newtonsoft.Json;
 
 namespace BotKeeper.Service.Core.Services {
     internal class HandlerFactory : IHandlerFactory {
-        //private Dictionary<string, Commands> commandsMap = new Dictionary<string, Commands> {
-        //	{ @"\help", Commands.Help },
-        //	{ @"\login", Commands.Login },
-        //	{ @"\register", Commands.Register }
-        //};
+        protected static Dictionary<string, IHandlerClient> commandHandlersMap = new Dictionary<string, IHandlerClient>();
+
+
+        public HandlerFactory() {
+            commandHandlersMap = InitCommandHandlerMap();
+        }
 
         public IHandlerClient GetHandlerForCommand(string text) {
             var userCommand = text?.Trim()?.ToLowerInvariant() ?? string.Empty;
@@ -29,14 +30,10 @@ namespace BotKeeper.Service.Core.Services {
             return new EmptyHandler();
         }
 
-
-        protected static Dictionary<string, IHandlerClient> commandHandlersMap = new Dictionary<string, IHandlerClient>();
-
         /// <summary>
-        /// inspired by the idea https://stackoverflow.com/a/6637710/8840033
+        /// inspired by https://stackoverflow.com/a/6637710/8840033
         /// </summary>
-        /// <returns></returns>
-        public static Dictionary<string, IHandlerClient> GetCommands() {
+        public static Dictionary<string, IHandlerClient> InitCommandHandlerMap() {
             var props = typeof(Context).GetMethods();
             foreach (var handlerMethod in props) {
                 var attrs = handlerMethod.GetCustomAttributes(true);
@@ -52,14 +49,14 @@ namespace BotKeeper.Service.Core.Services {
         }
 
         protected static IHandlerClient CreateHandlerClient(MethodInfo handler) {
-            return new HandlerClient(handler);
+            return new ConcreteHandler(handler);
         }
     }
 
-    internal class HandlerClient : IHandlerClient {
+    internal class ConcreteHandler : IHandlerClient {
         private readonly MethodInfo handler;
 
-        public HandlerClient(MethodInfo handler) {
+        public ConcreteHandler(MethodInfo handler) {
             this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
         }
 
@@ -81,7 +78,7 @@ namespace BotKeeper.Service.Core.Services {
         private Dictionary<string, object> CreateRequestInfo(Context context, MessageEventArgs request) {
             return new Dictionary<string, object> {
                 {nameof(context), JsonConvert.SerializeObject(context)},
-                {nameof(context), JsonConvert.SerializeObject(request)}
+                {nameof(request), JsonConvert.SerializeObject(request)}
             };
         }
     }

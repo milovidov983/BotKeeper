@@ -7,6 +7,7 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core {
     internal abstract class State {
         protected Context context;
+        protected IStateFactory stateFactory;
 
         public void SetContext(Context context) {
             this.context = context;

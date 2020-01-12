@@ -8,33 +8,72 @@ using System.Text;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class StateFactory : IStateFactory {
-		private Dictionary<string, Func<State>> stateMap;
-		private State defaultState = new DefaultState();
+		private readonly Dictionary<string, Func<State>> nameStateMapping;
+		private readonly Dictionary<Type, State> statesPool;
+		private readonly State defaultState = new DefaultState();
 		private readonly ILogger logger;
 
 		public StateFactory(ILogger logger) {
-			stateMap = Assembly.GetAssembly(typeof(State))
+			var statesInheritors = Assembly.GetAssembly(typeof(State))
 				.GetTypes()
-				.Where(type => type.IsSubclassOf(typeof(State)))
-				.ToDictionary(
-						x => x.Name,
-						x => (Func<State>)(() => GetInstance(x.AssemblyQualifiedName))
-						);
+				.Where(type => type.IsSubclassOf(typeof(State)));
+
+
+			foreach(var stateTypeInfo in statesInheritors) {
+				var lambdaStateCreator = CreateInstanceOf(stateTypeInfo);
+				nameStateMapping.Add(stateTypeInfo.Name, lambdaStateCreator);
+				statesPool.Add(stateTypeInfo.DeclaringType, lambdaStateCreator.Invoke());
+			}
+
 			this.logger = logger;
 		}
 
-		private State GetInstance(string fullyQualifiedName) {
-			// taken from here: https://stackoverflow.com/a/27119311/8840033
-			Type t = Type.GetType(fullyQualifiedName);
-			return (State)Activator.CreateInstance(t);
-		}
+
 
 		public State CreateState(string stateName, string requestContext = "") {
-			if (stateMap.TryGetValue(stateName ?? string.Empty, out var stateCreator)) {
+			if (nameStateMapping.TryGetValue(stateName ?? string.Empty, out var stateCreator)) {
 				return stateCreator.Invoke();
 			}
-			logger.Warn($"Unknown state {stateName}. {requestContext}");
+
+			LogDefaultStateSet(stateName, requestContext);
 			return defaultState;
 		}
+
+
+		public State GetState(Type stateType, string requestContext = "") {
+			if (statesPool.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
+				return stateInstance;
+			}
+
+			LogDefaultStateSet(stateType, requestContext);
+			return defaultState;
+		}
+
+		#region Helpers
+		private Func<State> CreateInstanceOf(Type stateTypeInfo) {
+			return () => GetInstance(stateTypeInfo.AssemblyQualifiedName);
+		}
+		private State GetInstance(string fullyQualifiedName) {
+			// taken from here: https://stackoverflow.com/a/27119311/8840033
+			Type stateType = Type.GetType(fullyQualifiedName);
+			return (State)Activator.CreateInstance(stateType);
+		}
+		#endregion
+
+		#region Logging
+		private void LogDefaultStateSet(string stateName, string requestContext) {
+			var stateType = Type.GetType(stateName);
+			LogDefaultStateSet(stateType, requestContext);
+		}
+
+		private void LogDefaultStateSet(Type stateType, string requestContext) {
+			var mainLogInfo = $"Default state( {defaultState.GetType()} ) selected. ";
+			var additionalLogInfo = $"Unknown state: [ {stateType.Name} <-- ] ";
+
+			logger.Warn(mainLogInfo + additionalLogInfo + requestContext);
+		}
+
+		#endregion
+
 	}
 }

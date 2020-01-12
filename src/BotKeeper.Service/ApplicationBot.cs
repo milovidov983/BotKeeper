@@ -1,6 +1,7 @@
 ﻿namespace BotKeeper.Service {
 	using BotKeeper.Service.Core;
-	using BotKeeper.Service.Core.Interfaces;
+    using BotKeeper.Service.Core.Factories;
+    using BotKeeper.Service.Core.Interfaces;
 	using BotKeeper.Service.Core.Models;
 	using BotKeeper.Service.Core.Services;
 	using BotKeeper.Service.Core.States;
@@ -17,17 +18,18 @@
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
 
-		public ApplicationBot(
-			TelegramBotClient client,
-			IStorage storage) {
-			logger = Settings.Logger;
-
+		public ApplicationBot(TelegramBotClient client, IStorage storage) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 
-			var sender = new SenderService(client);
+			var metricFactory = new MetricsFactory(Settings.Instance.Env, Settings.Logger);
+			var metricService = metricFactory.CreateMetricsService();
+			var sender = new SenderService(client, metricService);
+
 			serviceFactory = new ServiceFactory(storage, sender, Settings.Logger);
 			handlerFactory = serviceFactory.HandlerFactory;
 			contextFactory = serviceFactory.ContextFactory;
+
+			logger = Settings.Logger;
 		}
 
 		public void Run() {

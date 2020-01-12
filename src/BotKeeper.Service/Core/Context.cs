@@ -35,10 +35,15 @@ namespace BotKeeper.Service.Core {
 
         public async Task TransitionToAsync(State state, long userId) {
             currentState = state;
-            await storage.SetUserState(userId, state);
+            await SaveCurrentUserState(state, userId);
             currentState.SetContext(this);
         }
 
+        private async Task SaveCurrentUserState(State state, long userId) {
+            await storage.SetUserState(userId, state);
+        }
+
+        [Command(@"\init")]
         public async Task InitialState(MessageEventArgs request) {
             await currentState.Initial(request);
         }
@@ -62,6 +67,7 @@ namespace BotKeeper.Service.Core {
             await currentState.Login(request);
         }
 
+        [Command(@"\save")]
         public async Task Save(MessageEventArgs request) {
             await currentState.Save(request);
         }

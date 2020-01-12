@@ -1,4 +1,5 @@
 ﻿using BotKeeper.Service.Core.Interfaces;
+using BotKeeper.Service.Core.Services;
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IServiceFactory {

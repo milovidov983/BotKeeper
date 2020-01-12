@@ -9,7 +9,7 @@ namespace BotKeeper.Service.Infrastructure {
 		private readonly bool logTime;
 		
 		private string Time() => logTime 
-			? $"{DateTime.UtcNow.ToLongTimeString()} "
+			? $"{DateTime.UtcNow.ToLongTimeString()}"
 			: string.Empty;
 		
 
@@ -27,34 +27,28 @@ namespace BotKeeper.Service.Infrastructure {
 		}
 
 		public void Error(Exception e, Dictionary<string, object> requestInfo) {
-			Console.ForegroundColor = ConsoleColor.DarkRed;
-			Console.WriteLine($"{Time()} Error: {JsonConvert.SerializeObject(requestInfo)}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Error: {JsonConvert.SerializeObject(requestInfo)}");
 		}
 
 		public void Info(string text) {
-			Console.WriteLine($"{Time()} Info: {text}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Info: {text}");
 		}
 
 		public void Trace(string text) {
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine($"{Time()} Trace: {text}",	Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Trace: {text}");
 		}
 	
 
 		public void Warn(Exception ex, string message) {
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine($"{Time()} Warn: {ex.Message}, {message}", Console.ForegroundColor);
-			//todo requestMessage
+			Console.WriteLine($"{Time()} Warn: {ex.Message}, {message}");
 		}
 
 		public void Warn(string message) {
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine($"{Time()} Warn: {message}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Warn: {message}");
 		}
 
 		public void Trace(string title, Dictionary<string, object> requestInfo) {
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine($"{Time()} Trace: {title}\n{JsonConvert.SerializeObject(requestInfo)}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Trace: {title}\n{JsonConvert.SerializeObject(requestInfo)}");
 		}
 	}
 }
