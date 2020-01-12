@@ -12,7 +12,7 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		public void SendErrorMessage(MessageEventArgs request, BotException ex) {
-			sender.Send(ex.Message, request);
+			sender.Send($"{nameof(TestEmegencyService)} " + ex.Message, request);
 		}
 	}
 }

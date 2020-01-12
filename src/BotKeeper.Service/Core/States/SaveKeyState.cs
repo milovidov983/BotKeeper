@@ -9,7 +9,7 @@ namespace BotKeeper.Service.Core.States {
 		public SaveKeyState(IStateFactory stateFactory) : base(stateFactory) {
 		}
 
-		public override async Task Handle(MessageEventArgs request) {
+		public override async Task DefaultAction(MessageEventArgs request) {
 			await Task.Yield();
 			var key = request.GetClearedTextMessage();
 
@@ -23,7 +23,7 @@ namespace BotKeeper.Service.Core.States {
 		public override async Task No(MessageEventArgs request) {
 			var memberState = stateFactory.Create(typeof(MemberState));
 			await context.TransitionToAsync(memberState, request.GetUserId());
-			await context.Save(request);
+			await commands.Save(request);
 		}
 	}
 }

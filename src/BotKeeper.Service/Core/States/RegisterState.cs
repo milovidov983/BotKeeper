@@ -12,7 +12,7 @@ namespace BotKeeper.Service.Core.States {
         public RegisterState(IStateFactory stateFactory) : base(stateFactory) {
         }
 
-        public override async Task Handle(MessageEventArgs request) {
+        public override async Task DefaultAction(MessageEventArgs request) {
             await Register(request);
         }
 

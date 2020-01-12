@@ -7,7 +7,7 @@ namespace BotKeeper.Service.Core.States {
         public AdminState(IStateFactory stateFactory) : base(stateFactory) {
         }
 
-        public override async Task Handle(MessageEventArgs request) {
+        public override async Task DefaultAction(MessageEventArgs request) {
             context.Sender.Send("Handle Admin!", request);
             await Task.Yield();
         }

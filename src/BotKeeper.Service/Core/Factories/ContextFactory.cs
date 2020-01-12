@@ -18,6 +18,10 @@ namespace BotKeeper.Service.Core.Factories {
 			this.stateFactory = stateFactory ?? throw new ArgumentNullException(nameof(stateFactory));
 		}
 
+		/// <summary>
+		/// Try restore the previous state of the user
+		/// If the state is not saved, create the state in accordance with the rules.
+		/// </summary>
 		public async Task<BotContext> CreateContext(long userId) {
 			var storedUserState = await storage.GetUserState(userId);
 
@@ -27,7 +31,7 @@ namespace BotKeeper.Service.Core.Factories {
 			} else {
 				var isUserExist = await userService.IsUserExist(userId);
 				if (isUserExist) {
-					var guestState = stateFactory.Create(typeof(GuestState));
+					var guestState = stateFactory.Create(typeof(MemberState));
 					return new BotContext(guestState, serviceFactory, userId);
 				}
 			}

@@ -7,7 +7,7 @@ namespace BotKeeper.Service.Core.States {
         public DefaultState(IStateFactory stateFactory) : base(stateFactory) {
         }
 
-        public override async Task Handle(MessageEventArgs request) {
+        public override async Task DefaultAction(MessageEventArgs request) {
             await Initial(request);
         }
 
@@ -33,7 +33,7 @@ namespace BotKeeper.Service.Core.States {
                 context.Sender.Send("DefaultState: You registered yet. Redirect to GuestState", request);
                 var guestState = stateFactory.Create(typeof(GuestState));
                 await context.TransitionToAsync(guestState, request.Message.From.Id);
-                await context.Handle(request);
+                await commands.DefaultAction(request);
             }
         }
 

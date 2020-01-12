@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.IO;
-using Newtonsoft.Json;
-using System.Linq;
-using BotKeeper.Service.Core;
+﻿using BotKeeper.Service.Core;
 using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Core.Models;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Persistence.Db {
-
-
 	internal class StorageResult<T> : IStorageResult<T> {
 		private T result;
-		private bool hasResult;
-		public bool HasResult { get { return hasResult; } set { hasResult = value; } }
+		public bool HasResult { get; set; }
 		public T Result { 
 			get {
 				return result;
 			}
 			set {
 				result = value;
-				hasResult = true;
+				HasResult = true;
 			} 
 		}
 	}
@@ -47,9 +43,6 @@ namespace BotKeeper.Service.Persistence.Db {
 		public Storage() {
 			LoadDb();
 		}
-
-
-
 
 		#region Data access methods
 		public async Task<IStorageResult<string>> GetUserState(long id) {

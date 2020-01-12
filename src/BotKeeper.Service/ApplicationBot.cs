@@ -15,7 +15,7 @@
 
 		private readonly TelegramBotClient client;
 		private readonly IServiceFactory serviceFactory;
-		private readonly IStratagyRepository handlerFactory;
+		private readonly ICommandHandlerFactory handlerFactory;
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
 		private readonly IEmegencyService emegencyService;
@@ -50,7 +50,7 @@
 				var userId = request.GetUserId();
 				var context = await contextFactory.CreateContext(userId);
 				var userTextMessage = request.GetClearedTextMessage();
-				var handler = handlerFactory.GetStratagyForCommand(userTextMessage);
+				var handler = handlerFactory.CreateHandlerForCommand(userTextMessage);
 
 				handler.Execute(context, request);
 				logger.Trace($"Message processed  {request.Message.Text}");
@@ -73,9 +73,8 @@
 				logger.Warn(ex, request.ToJson());
 			}
 
+			/// We assume that in the production version you do not need to send an error message to the chat
 			emegencyService.SendErrorMessage(request, ex);
-
-			/// Some additional logic
 		}
 
 

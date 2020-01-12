@@ -5,6 +5,7 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core {
     internal abstract class State {
         protected BotContext context;
+        protected CommandController commands;
         protected IStateFactory stateFactory;
         public string CurrentState { get {
                 return this.GetType().Name;
@@ -17,6 +18,7 @@ namespace BotKeeper.Service.Core {
 
         public void SetContext(BotContext context) {
             this.context = context;
+            commands = context.Commands;
         }
 
         public virtual async Task ShowHelp(MessageEventArgs request) {
@@ -27,7 +29,7 @@ namespace BotKeeper.Service.Core {
             await Task.Yield();
             // do nothing, write log
         }
-        public virtual async Task Handle(MessageEventArgs request) {
+        public virtual async Task DefaultAction(MessageEventArgs request) {
             await Task.Yield();
             // do nothing, write log
         }

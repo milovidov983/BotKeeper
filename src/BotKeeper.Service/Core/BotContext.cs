@@ -1,19 +1,28 @@
-﻿using BotKeeper.Service.Core.Helpers;
-using BotKeeper.Service.Core.Interfaces;
+﻿using BotKeeper.Service.Core.Interfaces;
 using System.Threading.Tasks;
-using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
     internal class BotContext {
         private State currentState;
+        private readonly CommandController commands;
         private readonly IStorage storage;
+        private State CurrentState { 
+            get => currentState; 
+            set {
+                commands.CurrentState = value;
+                currentState = value;
+            }
+        }
 
         public readonly ISender Sender;
-        public readonly IStratagyRepository HandlerFactory;
+        public readonly ICommandHandlerFactory HandlerFactory;
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
 
+        public CommandController Commands { get => commands; }
+
         public BotContext(State state, IServiceFactory serviceFactory, long? userId = null) {
+            commands = new CommandController(state);
             storage = serviceFactory.Storage;
 
             UserService = serviceFactory.UserService;
@@ -25,49 +34,22 @@ namespace BotKeeper.Service.Core {
             } else {
                 TransitionTo(state);
             }
+
+            
         }
 
         public async Task TransitionToAsync(State state, long userId) {
-            currentState = state;
+            CurrentState = state;
             await SaveCurrentUserState(state, userId);
-            currentState.SetContext(this);
+            CurrentState.SetContext(this);
         }
 
         private void TransitionTo(State state) {
-            currentState = state;
-            currentState.SetContext(this);
+            CurrentState = state;
+            CurrentState.SetContext(this);
         }
         private async Task SaveCurrentUserState(State state, long userId) {
             await storage.SetUserState(userId, state);
         }
-
-        #region Commands
-
-        public async Task Handle(MessageEventArgs request) {
-            await currentState.Handle(request);
-        }
-
-        [Command(@"\init")]
-        public async Task InitialState(MessageEventArgs request) {
-            await currentState.Initial(request);
-        }
-
-        [Command(@"\help")]
-        public async Task ShowHelp(MessageEventArgs request) {
-            await currentState.ShowHelp(request);
-        }
-
-        [Command(@"\register")]
-        public async Task Register(MessageEventArgs request) {
-            await currentState.Register(request);
-        }
-        
-
-        [Command(@"\save")]
-        public async Task Save(MessageEventArgs request) {
-            await currentState.Save(request);
-        }
-
-        #endregion
     }
 }
