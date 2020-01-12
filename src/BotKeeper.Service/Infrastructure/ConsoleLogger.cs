@@ -1,4 +1,5 @@
 ﻿using BotKeeper.Service.Core.Interfaces;
+using BotKeeper.Service.Core.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,11 @@ namespace BotKeeper.Service.Infrastructure {
 
 		public void Error(Exception ex, string message) {
 			Console.WriteLine($"{Time()} Error: {ex.Message}, {message}");
+			//todo requestMessage
+		}		
+		
+		public void Error(Exception ex, IMetrics metrics) {
+			Console.WriteLine($"{Time()} Error: {ex.Message}, {CreateLoggerInfo(metrics)}");
 			//todo requestMessage
 		}
 
@@ -49,6 +55,26 @@ namespace BotKeeper.Service.Infrastructure {
 
 		public void Trace(string title, Dictionary<string, object> requestInfo) {
 			Console.WriteLine($"{Time()} Trace: {title}\n{JsonConvert.SerializeObject(requestInfo)}");
+		}		
+		
+		public void Trace(string title, IMetrics metrics = null) {
+			Console.WriteLine($"{Time()} Trace: {title}\n{CreateLoggerInfo(metrics)}");
+		}
+
+
+
+		private static Dictionary<string, object> CreateLoggerInfo(IMetrics metrics) {
+			if (metrics is null) {
+				return new Dictionary<string, object> {
+					{ nameof(metrics), "is null"},
+				};
+			}
+
+			return new Dictionary<string, object> {
+				{ nameof(metrics.CurrentState), metrics.CurrentState},
+				{ nameof(metrics.Message), metrics.Message},
+				{ nameof(metrics.Request), JsonConvert.SerializeObject(metrics.Request)}
+			};
 		}
 	}
 }

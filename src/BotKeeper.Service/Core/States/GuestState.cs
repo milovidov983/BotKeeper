@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using BotKeeper.Service.Core.Factories;
+using System.Threading.Tasks;
 using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.States {
     internal class GuestState : State {
+        public GuestState(IStateFactory stateFactory) : base(stateFactory) {
+        }
+
         public override async Task Handle(MessageEventArgs request) {
             context.Sender.Send("Handle Member!", request);
             await Task.Yield();
@@ -12,20 +16,9 @@ namespace BotKeeper.Service.Core.States {
             await Task.Yield();
         }
 
-        public override async Task Login(MessageEventArgs request) {
-            context.Sender.Send("Type and send your password:", request);
-            await context.TransitionToAsync(new LoginState(), request.Message.From.Id);
-        }
-
-        public override Task No(MessageEventArgs request) {
-            throw new System.NotImplementedException();
-        }
 
         public override async Task Register(MessageEventArgs request) {
-            await Task.Yield();
-        }
-
-        public override async Task Save(MessageEventArgs request) {
+            context.Sender.Send("You registered yet", request);
             await Task.Yield();
         }
 
@@ -34,9 +27,6 @@ namespace BotKeeper.Service.Core.States {
             await Task.Yield();
         }
 
-        public override Task Yes(MessageEventArgs request) {
-            throw new System.NotImplementedException();
-        }
     }
 }
 

@@ -49,6 +49,8 @@ namespace BotKeeper.Service.Persistence.Db {
 		}
 
 
+
+
 		#region Data access methods
 		public async Task<IStorageResult<string>> GetUserState(long id) {
 			await Task.Yield();
@@ -172,13 +174,27 @@ namespace BotKeeper.Service.Persistence.Db {
 		}
 
 		public void LoadDb() {
-			var userDbJson = File.ReadAllText(fileDb);
-			var usersJson = File.ReadAllText(fileUsers);
-			var userStatesJson = File.ReadAllText(fileUserStates);
+			var userDbJson = LoadFromFile(fileDb);
+			var usersJson = LoadFromFile(fileUsers);
+			var userStatesJson = LoadFromFile(fileUserStates);
 
-			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<long, ConcurrentDictionary<string, string>>>(userDbJson);
-			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, PersistedUser>>(usersJson);
-			userStates = JsonConvert.DeserializeObject<ConcurrentDictionary<long, string>>(userStatesJson);
+			storage = JsonConvert.DeserializeObject<ConcurrentDictionary<long, ConcurrentDictionary<string, string>>>(userDbJson)
+				?? new ConcurrentDictionary<long, ConcurrentDictionary<string, string>>();
+
+			users = JsonConvert.DeserializeObject<ConcurrentDictionary<long, PersistedUser>>(usersJson)
+				?? new ConcurrentDictionary<long, PersistedUser>();
+
+			userStates = JsonConvert.DeserializeObject<ConcurrentDictionary<long, string>>(userStatesJson)
+				?? new ConcurrentDictionary<long, string>();
+		}
+
+		private string LoadFromFile(string path) {
+			if (File.Exists(path)) {
+				return File.ReadAllText(path);
+			}
+
+			File.CreateText(path).Close();
+			return string.Empty;
 		}
 
 		#endregion

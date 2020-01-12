@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BotKeeper.Service.Core.Models;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,17 +9,18 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.Helpers {
 	public  static class Ext {
-		public static void SafeRun(Func<Task> action, Dictionary<string, object> requestInfo = null) {
+		public static void SafeRun(Func<Task> action, Dictionary<string, object> metrics = null) {
 			Task.Run(async () => {
 				try {
 					await action.Invoke();
 				} catch (Exception e) {
-					Settings.Logger.Error(e, requestInfo);
+					Settings.Logger.Error(e, metrics);
 				}
-				Settings.Logger.Trace("Task completed successfully:", requestInfo);
+				Settings.Logger.Trace("Task completed successfully:\n", metrics);
 			});
 		}
 
+	
 
 		public static string GetHash(this string value) {
 			return ComputeSha256Hash(value);
@@ -38,6 +41,12 @@ namespace BotKeeper.Service.Core.Helpers {
 
 		public static long GetUserId(this MessageEventArgs messageEventArgs) {
 			return messageEventArgs.Message.From.Id;
+		}
+
+
+
+		public static string ClearTextMessage(this MessageEventArgs request) {
+			return request.Message.Text?.Trim()?.ToLowerInvariant() ?? string.Empty;
 		}
 	}
 }

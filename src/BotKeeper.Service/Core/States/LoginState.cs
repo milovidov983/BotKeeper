@@ -1,4 +1,5 @@
-﻿using BotKeeper.Service.Core.Helpers;
+﻿using BotKeeper.Service.Core.Factories;
+using BotKeeper.Service.Core.Helpers;
 using BotKeeper.Service.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,10 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.States {
     internal class LoginState : State {
         private Dictionary<long, int> count = new Dictionary<long, int>();
+
+        public LoginState(IStateFactory stateFactory) : base(stateFactory) {
+        }
+
         public override async Task Handle(MessageEventArgs request) {
             await Login(request);
         }
@@ -22,13 +27,16 @@ namespace BotKeeper.Service.Core.States {
             var user = await context.UserService.Get(request.Message.From.Id);
             if(user.Secret == password.GetHash()) {
                 context.Sender.Send($"Welcome {user.Name}!", request);
-                await context.TransitionToAsync(new MemberState(), request.Message.From.Id);
+
+                var memberState = stateFactory.GetState(typeof(MemberState));
+                await context.TransitionToAsync(memberState, request.Message.From.Id);
             } else {
                 var hasAttempt = AnyAttempts(user);
                 if (hasAttempt) {
                     context.Sender.Send("Wrong password, try again: ", request);
                 } else {
-                    await context.TransitionToAsync(new DefaultState(), request.Message.From.Id);
+                    var defaultState = stateFactory.GetState(typeof(DefaultState));
+                    await context.TransitionToAsync(defaultState, request.Message.From.Id);
                 }
             }
         }

@@ -5,7 +5,14 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
     internal class Context {
-        private State currentState = null;
+        State _currentState;
+        private State currentState { 
+            get {
+                return _currentState;
+            } set {
+                _currentState = value;
+            } 
+        }
         private readonly IStorage storage;
 
         public readonly ISender Sender;
@@ -15,10 +22,10 @@ namespace BotKeeper.Service.Core {
 
         public Context(State state, IServiceFactory serviceFactory, long? userId = null) {
             storage = serviceFactory.Storage;
+
             UserService = serviceFactory.UserService;
             Sender = serviceFactory.Sender;
             HandlerFactory = serviceFactory.HandlerFactory;
-
 
             if (userId.HasValue) {
                 TransitionToAsync(state, userId.Value).GetAwaiter().GetResult();

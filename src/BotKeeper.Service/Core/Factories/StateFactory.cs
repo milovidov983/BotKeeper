@@ -8,22 +8,29 @@ using System.Text;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class StateFactory : IStateFactory {
-		private readonly Dictionary<string, Func<State>> nameStateMapping;
-		private readonly Dictionary<Type, State> statesPool;
-		private readonly State defaultState = new DefaultState();
+		private readonly Dictionary<string, Func<State>> nameStateMapping
+			= new Dictionary<string, Func<State>>();
+
+		private readonly Dictionary<Type, State> statePool
+			= new Dictionary<Type, State>();
+
 		private readonly ILogger logger;
 
+		public State DefaultState { get; private set; }
 		public StateFactory(ILogger logger) {
 			var statesInheritors = Assembly.GetAssembly(typeof(State))
-				.GetTypes()
-				.Where(type => type.IsSubclassOf(typeof(State)));
+											.GetTypes()
+											.Where(type => type.IsSubclassOf(typeof(State)))
+											.Where(type => type != typeof(DefaultState));
 
-
-			foreach(var stateTypeInfo in statesInheritors) {
+			foreach (var stateTypeInfo in statesInheritors) {
 				var lambdaStateCreator = CreateInstanceOf(stateTypeInfo);
+
 				nameStateMapping.Add(stateTypeInfo.Name, lambdaStateCreator);
-				statesPool.Add(stateTypeInfo.DeclaringType, lambdaStateCreator.Invoke());
+				statePool.Add(stateTypeInfo, lambdaStateCreator.Invoke());
 			}
+
+			DefaultState = new DefaultState(this);
 
 			this.logger = logger;
 		}
@@ -36,27 +43,32 @@ namespace BotKeeper.Service.Core.Factories {
 			}
 
 			LogDefaultStateSet(stateName, requestContext);
-			return defaultState;
+			return DefaultState;
 		}
 
 
 		public State GetState(Type stateType, string requestContext = "") {
-			if (statesPool.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
+			if (statePool.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
 				return stateInstance;
 			}
 
 			LogDefaultStateSet(stateType, requestContext);
-			return defaultState;
+			return DefaultState;
 		}
 
 		#region Helpers
 		private Func<State> CreateInstanceOf(Type stateTypeInfo) {
-			return () => GetInstance(stateTypeInfo.AssemblyQualifiedName);
+			return () => {
+				var stateInstance = GetInstance(stateTypeInfo.AssemblyQualifiedName);
+
+				return stateInstance;
+			};
 		}
 		private State GetInstance(string fullyQualifiedName) {
 			// taken from here: https://stackoverflow.com/a/27119311/8840033
 			Type stateType = Type.GetType(fullyQualifiedName);
-			return (State)Activator.CreateInstance(stateType);
+			Object[] args = { this };
+			return (State)Activator.CreateInstance(stateType, args);
 		}
 		#endregion
 
@@ -67,7 +79,7 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		private void LogDefaultStateSet(Type stateType, string requestContext) {
-			var mainLogInfo = $"Default state( {defaultState.GetType()} ) selected. ";
+			var mainLogInfo = $"Default state( {DefaultState.GetType()} ) selected. ";
 			var additionalLogInfo = $"Unknown state: [ {stateType.Name} <-- ] ";
 
 			logger.Warn(mainLogInfo + additionalLogInfo + requestContext);

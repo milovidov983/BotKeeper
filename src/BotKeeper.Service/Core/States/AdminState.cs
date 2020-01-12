@@ -1,8 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using BotKeeper.Service.Core.Factories;
+using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
     internal class AdminState : State {
+        public AdminState(IStateFactory stateFactory) : base(stateFactory) {
+        }
+
         public override async Task Handle(MessageEventArgs request) {
             context.Sender.Send("Handle Admin!", request);
             await Task.Yield();

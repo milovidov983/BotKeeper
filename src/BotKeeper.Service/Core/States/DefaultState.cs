@@ -1,12 +1,12 @@
-﻿using BotKeeper.Service.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BotKeeper.Service.Core.Factories;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
     internal class DefaultState : State {
+        public DefaultState(IStateFactory stateFactory) : base(stateFactory) {
+        }
+
         public override async Task Handle(MessageEventArgs request) {
             await Initial(request);
         }
@@ -16,43 +16,36 @@ namespace BotKeeper.Service.Core.States {
             await Task.Yield();
         }
 
-        public override async Task Login(MessageEventArgs request) {
-            await Task.Yield();
-        }
-
-        public override Task No(MessageEventArgs request) {
-            throw new NotImplementedException();
-        }
-
         public override async Task Register(MessageEventArgs request) {
             var userId = request.Message.From.Id;
 
             var accountIsFree = ! (await context.UserService.IsUserExist(request.Message.From.Id));
             if (accountIsFree) {
-                bool isCreated = await context.UserService.CreateNewAccount(userId);
-                if (isCreated) {
+                bool isCreatedSuccess = await context.UserService.CreateNewAccount(userId);
+                if (isCreatedSuccess) {
                     context.Sender.Send("A new account has been created for you", request);
                 } else {
                     context.Sender.Send("Error creating account", request);
                 }
-                await context.TransitionToAsync(new MemberState(), request.Message.From.Id);
+                var memberState = stateFactory.GetState(typeof(MemberState));
+                await context.TransitionToAsync(memberState, request.Message.From.Id);
             } else {
-                await context.TransitionToAsync(new GuestState(), request.Message.From.Id);
-                await context.Login(request);
+                context.Sender.Send("DefaultState: You registered yet. Redirect to GuestState", request);
+                var guestState = stateFactory.GetState(typeof(GuestState));
+                await context.TransitionToAsync(guestState, request.Message.From.Id);
+                await context.Handle(request);
             }
         }
 
-        public override async Task Save(MessageEventArgs request) {
-            await Task.Yield();
-        }
-
         public override async Task ShowHelp(MessageEventArgs request) {
-            context.Sender.Send("Guest help information...",request);
+            context.Sender.Send("DefaultState Guest help information...", request);
             await Task.Yield();
         }
 
-        public override Task Yes(MessageEventArgs request) {
-            throw new NotImplementedException();
+        public override async Task Login(MessageEventArgs request) {
+            context.Sender.Send("DefaultState Type and send your password:", request);
+            var loginState = stateFactory.GetState(typeof(LoginState));
+            await context.TransitionToAsync(loginState, request.Message.From.Id);
         }
     }
 }

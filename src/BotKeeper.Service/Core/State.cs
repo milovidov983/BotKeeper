@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BotKeeper.Service.Core.Factories;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
@@ -8,6 +6,14 @@ namespace BotKeeper.Service.Core {
     internal abstract class State {
         protected Context context;
         protected IStateFactory stateFactory;
+        public string CurrentState { get {
+                return this.GetType().Name;
+            } 
+        }
+
+        public State(IStateFactory stateFactory) {
+            this.stateFactory = stateFactory;
+        }
 
         public void SetContext(Context context) {
             this.context = context;
