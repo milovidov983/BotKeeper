@@ -8,10 +8,10 @@ using System.Text;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class StateFactory : IStateFactory {
-		private readonly Dictionary<Type, State> statePool
+		private readonly Dictionary<Type, State> statesInstances
 			= new Dictionary<Type, State>();
 
-		private readonly Dictionary<string, Type> nameTypeStatesMap
+		private readonly Dictionary<string, Type> namesTypesMap
 				= new Dictionary<string, Type>();
 
 		private readonly ILogger logger;
@@ -26,8 +26,8 @@ namespace BotKeeper.Service.Core.Factories {
 			foreach (var stateTypeInfo in statesInheritors) {
 				var stateInstance = CreateInstanceOf(stateTypeInfo);
 
-				nameTypeStatesMap.Add(stateTypeInfo.Name, stateTypeInfo);
-				statePool.Add(stateTypeInfo, stateInstance);
+				namesTypesMap.Add(stateTypeInfo.Name, stateTypeInfo);
+				statesInstances.Add(stateTypeInfo, stateInstance);
 			}
 
 			DefaultState = new DefaultState(this);
@@ -36,7 +36,7 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		public State Create(string stateName, string requestContext = "") {
-			if (nameTypeStatesMap.TryGetValue(stateName ?? string.Empty, out var stateInstance)) {
+			if (namesTypesMap.TryGetValue(stateName ?? string.Empty, out var stateInstance)) {
 				return Create(stateInstance, requestContext);
 			}
 
@@ -46,7 +46,7 @@ namespace BotKeeper.Service.Core.Factories {
 
 
 		public State Create(Type stateType, string requestContext = "") {
-			if (statePool.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
+			if (statesInstances.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
 				return stateInstance;
 			}
 
@@ -80,6 +80,5 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		#endregion
-
 	}
 }

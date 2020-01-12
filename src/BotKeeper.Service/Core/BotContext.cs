@@ -4,12 +4,11 @@ using System.Threading.Tasks;
 namespace BotKeeper.Service.Core {
     internal class BotContext {
         private State currentState;
-        private readonly CommandController commands;
         private readonly IStorage storage;
         private State CurrentState { 
             get => currentState; 
             set {
-                commands.CurrentState = value;
+                Commands.CurrentState = value;
                 currentState = value;
             }
         }
@@ -19,10 +18,10 @@ namespace BotKeeper.Service.Core {
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
 
-        public CommandController Commands { get => commands; }
+		public CommandController Commands { get; }
 
-        public BotContext(State state, IServiceFactory serviceFactory, long? userId = null) {
-            commands = new CommandController(state);
+		public BotContext(State state, IServiceFactory serviceFactory, long? userId = null) {
+            Commands = new CommandController(state);
             storage = serviceFactory.Storage;
 
             UserService = serviceFactory.UserService;
@@ -34,8 +33,6 @@ namespace BotKeeper.Service.Core {
             } else {
                 TransitionTo(state);
             }
-
-            
         }
 
         public async Task TransitionToAsync(State state, long userId) {

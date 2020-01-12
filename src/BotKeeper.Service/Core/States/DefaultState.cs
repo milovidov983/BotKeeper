@@ -31,8 +31,8 @@ namespace BotKeeper.Service.Core.States {
                 await context.TransitionToAsync(memberState, request.Message.From.Id);
             } else {
                 context.Sender.Send("DefaultState: You registered yet. Redirect to GuestState", request);
-                var guestState = stateFactory.Create(typeof(GuestState));
-                await context.TransitionToAsync(guestState, request.Message.From.Id);
+                var memberState = stateFactory.Create(typeof(MemberState));
+                await context.TransitionToAsync(memberState, request.Message.From.Id);
                 await commands.DefaultAction(request);
             }
         }
