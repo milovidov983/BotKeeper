@@ -10,6 +10,7 @@ namespace BotKeeper.Service {
 		public string ApiKey { get; set; }
 		public static Settings Instance { get; set; }
 		public static ILogger Logger { get; set; }
+ 
 		static Settings(){
 			Instance = new Settings {
 				ApiKey = Environment.GetEnvironmentVariable("botapikey")

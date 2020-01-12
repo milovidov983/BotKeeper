@@ -18,38 +18,43 @@ namespace BotKeeper.Service.Infrastructure {
 		}
 
 		public void Error(Exception ex, string message) {
-			Console.WriteLine($"{Time()}ERROR: {ex.Message}, {message}");
+			Console.WriteLine($"{Time()} Error: {ex.Message}, {message}");
 			//todo requestMessage
 		}
 
 		public void Error(Exception ex) {
-			Console.WriteLine($"{Time()}ERROR: {ex.Message}");
+			Console.WriteLine($"{Time()} Error: {ex.Message}");
 		}
 
 		public void Error(Exception e, Dictionary<string, object> requestInfo) {
 			Console.ForegroundColor = ConsoleColor.DarkRed;
-			Console.WriteLine($"{Time()}ERROR: {JsonConvert.SerializeObject(requestInfo)}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Error: {JsonConvert.SerializeObject(requestInfo)}", Console.ForegroundColor);
 		}
 
 		public void Info(string text) {
-			Console.WriteLine(Time() + text);
+			Console.WriteLine($"{Time()} Info: {text}", Console.ForegroundColor);
 		}
 
 		public void Trace(string text) {
 			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine(Time() + text,	Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Trace: {text}",	Console.ForegroundColor);
 		}
 	
 
 		public void Warn(Exception ex, string message) {
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine($"{Time()}WARNING: {ex.Message}, {message}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Warn: {ex.Message}, {message}", Console.ForegroundColor);
 			//todo requestMessage
 		}
 
 		public void Warn(string message) {
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine($"{Time()}WARNING: {message}", Console.ForegroundColor);
+			Console.WriteLine($"{Time()} Warn: {message}", Console.ForegroundColor);
+		}
+
+		public void Trace(string title, Dictionary<string, object> requestInfo) {
+			Console.ForegroundColor = ConsoleColor.Gray;
+			Console.WriteLine($"{Time()} Trace: {title}\n{JsonConvert.SerializeObject(requestInfo)}", Console.ForegroundColor);
 		}
 	}
 }

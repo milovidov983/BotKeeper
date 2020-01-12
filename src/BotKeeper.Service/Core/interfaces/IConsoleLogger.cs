@@ -8,7 +8,9 @@ namespace BotKeeper.Service.Core.Interfaces {
 		void Error(Exception ex, string message);
 		void Info(string text);
 		void Trace(string text);
+		void Trace(string title, Dictionary<string, object> requestInfo);
 		void Warn(Exception ex, string message);
 		void Warn(string message);
+
 	}
 }

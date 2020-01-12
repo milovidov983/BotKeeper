@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 using static BotKeeper.Service.Core.Services.HandlerFactory;
+using Newtonsoft;
+using Newtonsoft.Json;
 
 namespace BotKeeper.Service.Core.Services {
     internal class HandlerFactory : IHandlerFactory {
@@ -69,7 +71,18 @@ namespace BotKeeper.Service.Core.Services {
 
     internal class EmptyHandler : IHandlerClient {
         public void Execute(Context context, MessageEventArgs request) {
-            // do nothing
+            var metrics = CreateRequestInfo(context, request);
+            Ext.SafeRun(async () => await context.Handle(request), metrics);
+        }
+
+        /// <summary>
+        /// Cerate request info for error log.
+        /// </summary>
+        private Dictionary<string, object> CreateRequestInfo(Context context, MessageEventArgs request) {
+            return new Dictionary<string, object> {
+                {nameof(context), JsonConvert.SerializeObject(context)},
+                {nameof(context), JsonConvert.SerializeObject(request)}
+            };
         }
     }
 }

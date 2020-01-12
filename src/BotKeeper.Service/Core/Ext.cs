@@ -14,6 +14,7 @@ namespace BotKeeper.Service.Core.Helpers {
 				} catch (Exception e) {
 					Settings.Logger.Error(e, requestInfo);
 				}
+				Settings.Logger.Trace("Task completed successfully:", requestInfo);
 			});
 		}
 
