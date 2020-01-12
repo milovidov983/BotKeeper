@@ -22,12 +22,12 @@ namespace BotKeeper.Service.Core.Factories {
 			var storedUserState = await storage.GetUserState(userId);
 
 			if (storedUserState.HasResult) {
-				var storedState = stateFactory.CreateState(storedUserState.Result, $"user {userId}");
+				var storedState = stateFactory.Create(storedUserState.Result, $"user {userId}");
 				return new Context(storedState, serviceFactory);
 			} else {
 				var isUserExist = await userService.IsUserExist(userId);
 				if (isUserExist) {
-					var guestState = stateFactory.GetState(typeof(GuestState));
+					var guestState = stateFactory.Create(typeof(GuestState));
 					return new Context(guestState, serviceFactory, userId);
 				}
 			}

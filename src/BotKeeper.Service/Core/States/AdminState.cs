@@ -17,11 +17,6 @@ namespace BotKeeper.Service.Core.States {
             await Task.Yield();
         }
 
-        public override async Task Login(MessageEventArgs request) {
-            context.Sender.Send("You are login yet Admin!", request);
-            await Task.Yield();
-        }
-
         public override Task No(MessageEventArgs request) {
             throw new System.NotImplementedException();
         }

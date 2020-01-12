@@ -21,7 +21,7 @@ namespace BotKeeper.Service.Core.States {
 		}
 
 		public override async Task No(MessageEventArgs request) {
-			var memberState = stateFactory.GetState(typeof(MemberState));
+			var memberState = stateFactory.Create(typeof(MemberState));
 			await context.TransitionToAsync(memberState, request.GetUserId());
 			await context.Save(request);
 		}

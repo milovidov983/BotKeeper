@@ -8,11 +8,11 @@ using System.Text;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class StateFactory : IStateFactory {
-		private readonly Dictionary<string, Func<State>> nameStateMapping
-			= new Dictionary<string, Func<State>>();
-
 		private readonly Dictionary<Type, State> statePool
 			= new Dictionary<Type, State>();
+
+		private readonly Dictionary<string, Type> nameTypeStatesMap
+				= new Dictionary<string, Type>();
 
 		private readonly ILogger logger;
 
@@ -24,10 +24,10 @@ namespace BotKeeper.Service.Core.Factories {
 											.Where(type => type != typeof(DefaultState));
 
 			foreach (var stateTypeInfo in statesInheritors) {
-				var lambdaStateCreator = CreateInstanceOf(stateTypeInfo);
+				var stateInstance = CreateInstanceOf(stateTypeInfo);
 
-				nameStateMapping.Add(stateTypeInfo.Name, lambdaStateCreator);
-				statePool.Add(stateTypeInfo, lambdaStateCreator.Invoke());
+				nameTypeStatesMap.Add(stateTypeInfo.Name, stateTypeInfo);
+				statePool.Add(stateTypeInfo, stateInstance);
 			}
 
 			DefaultState = new DefaultState(this);
@@ -35,11 +35,9 @@ namespace BotKeeper.Service.Core.Factories {
 			this.logger = logger;
 		}
 
-
-
-		public State CreateState(string stateName, string requestContext = "") {
-			if (nameStateMapping.TryGetValue(stateName ?? string.Empty, out var stateCreator)) {
-				return stateCreator.Invoke();
+		public State Create(string stateName, string requestContext = "") {
+			if (nameTypeStatesMap.TryGetValue(stateName ?? string.Empty, out var stateInstance)) {
+				return Create(stateInstance, requestContext);
 			}
 
 			LogDefaultStateSet(stateName, requestContext);
@@ -47,7 +45,7 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 
-		public State GetState(Type stateType, string requestContext = "") {
+		public State Create(Type stateType, string requestContext = "") {
 			if (statePool.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
 				return stateInstance;
 			}
@@ -57,17 +55,13 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		#region Helpers
-		private Func<State> CreateInstanceOf(Type stateTypeInfo) {
-			return () => {
-				var stateInstance = GetInstance(stateTypeInfo.AssemblyQualifiedName);
-
-				return stateInstance;
-			};
+		private State CreateInstanceOf(Type stateTypeInfo) {
+			return GetInstance(stateTypeInfo.AssemblyQualifiedName);
 		}
 		private State GetInstance(string fullyQualifiedName) {
 			// taken from here: https://stackoverflow.com/a/27119311/8840033
 			Type stateType = Type.GetType(fullyQualifiedName);
-			Object[] args = { this };
+			object[] args = { this };
 			return (State)Activator.CreateInstance(stateType, args);
 		}
 		#endregion

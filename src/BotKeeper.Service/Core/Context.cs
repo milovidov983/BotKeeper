@@ -5,14 +5,7 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
     internal class Context {
-        State _currentState;
-        private State currentState { 
-            get {
-                return _currentState;
-            } set {
-                _currentState = value;
-            } 
-        }
+        private State currentState;
         private readonly IStorage storage;
 
         public readonly ISender Sender;
@@ -34,20 +27,25 @@ namespace BotKeeper.Service.Core {
             }
         }
 
-        private void TransitionTo(State state) {
-            currentState = state;
-            currentState.SetContext(this);
-        }
-
-
         public async Task TransitionToAsync(State state, long userId) {
             currentState = state;
             await SaveCurrentUserState(state, userId);
             currentState.SetContext(this);
         }
 
+        private void TransitionTo(State state) {
+            currentState = state;
+            currentState.SetContext(this);
+        }
         private async Task SaveCurrentUserState(State state, long userId) {
             await storage.SetUserState(userId, state);
+        }
+
+        #region Commands
+
+        
+        public async Task Handle(MessageEventArgs request) {
+            await currentState.Handle(request);
         }
 
         [Command(@"\init")]
@@ -65,18 +63,12 @@ namespace BotKeeper.Service.Core {
             await currentState.Register(request);
         }
         
-        public async Task Handle(MessageEventArgs request) {
-            await currentState.Handle(request);
-        }
-
-        [Command(@"\login")]
-        public async Task Login(MessageEventArgs request) {
-            await currentState.Login(request);
-        }
 
         [Command(@"\save")]
         public async Task Save(MessageEventArgs request) {
             await currentState.Save(request);
         }
+
+        #endregion
     }
 }

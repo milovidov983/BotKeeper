@@ -27,11 +27,11 @@ namespace BotKeeper.Service.Core.States {
                 } else {
                     context.Sender.Send("Error creating account", request);
                 }
-                var memberState = stateFactory.GetState(typeof(MemberState));
+                var memberState = stateFactory.Create(typeof(MemberState));
                 await context.TransitionToAsync(memberState, request.Message.From.Id);
             } else {
                 context.Sender.Send("DefaultState: You registered yet. Redirect to GuestState", request);
-                var guestState = stateFactory.GetState(typeof(GuestState));
+                var guestState = stateFactory.Create(typeof(GuestState));
                 await context.TransitionToAsync(guestState, request.Message.From.Id);
                 await context.Handle(request);
             }
@@ -40,12 +40,6 @@ namespace BotKeeper.Service.Core.States {
         public override async Task ShowHelp(MessageEventArgs request) {
             context.Sender.Send("DefaultState Guest help information...", request);
             await Task.Yield();
-        }
-
-        public override async Task Login(MessageEventArgs request) {
-            context.Sender.Send("DefaultState Type and send your password:", request);
-            var loginState = stateFactory.GetState(typeof(LoginState));
-            await context.TransitionToAsync(loginState, request.Message.From.Id);
         }
     }
 }

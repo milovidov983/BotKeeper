@@ -27,10 +27,6 @@ namespace BotKeeper.Service.Core {
             await Task.Yield();
             // do nothing, write log
         }
-        public virtual async Task Login(MessageEventArgs request) {
-            await Task.Yield();
-            // do nothing, write log
-        }
         public virtual async Task Handle(MessageEventArgs request) {
             await Task.Yield();
             // do nothing, write log

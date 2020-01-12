@@ -10,7 +10,7 @@ namespace BotKeeper.Service.Core.States {
 
 		public override async Task Save(MessageEventArgs request) {
 			context.Sender.Send("Enter key:", request);
-			var saveKeyState = stateFactory.GetState(typeof(SaveKeyState));
+			var saveKeyState = stateFactory.Create(typeof(SaveKeyState));
 			await context.TransitionToAsync(saveKeyState, request.Message.From.Id);
 		}
 
