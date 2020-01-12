@@ -4,7 +4,7 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
     internal abstract class State {
-        protected Context context;
+        protected BotContext context;
         protected IStateFactory stateFactory;
         public string CurrentState { get {
                 return this.GetType().Name;
@@ -15,7 +15,7 @@ namespace BotKeeper.Service.Core {
             this.stateFactory = stateFactory;
         }
 
-        public void SetContext(Context context) {
+        public void SetContext(BotContext context) {
             this.context = context;
         }
 

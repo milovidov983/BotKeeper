@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
-    internal class Context {
+    internal class BotContext {
         private State currentState;
         private readonly IStorage storage;
 
         public readonly ISender Sender;
-        public readonly IHandlerFactory HandlerFactory;
+        public readonly IStratagyRepository HandlerFactory;
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
 
-        public Context(State state, IServiceFactory serviceFactory, long? userId = null) {
+        public BotContext(State state, IServiceFactory serviceFactory, long? userId = null) {
             storage = serviceFactory.Storage;
 
             UserService = serviceFactory.UserService;
@@ -43,7 +43,6 @@ namespace BotKeeper.Service.Core {
 
         #region Commands
 
-        
         public async Task Handle(MessageEventArgs request) {
             await currentState.Handle(request);
         }

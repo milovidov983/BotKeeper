@@ -3,7 +3,7 @@ using BotKeeper.Service.Core.Services;
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IServiceFactory {
-		IHandlerFactory HandlerFactory { get; }
+		IStratagyRepository HandlerFactory { get; }
 		ISender Sender { get; }
 		IStorage Storage { get; }
 		IUserService UserService { get; }

@@ -14,7 +14,7 @@
 
 		private readonly TelegramBotClient client;
 		private readonly IServiceFactory serviceFactory;
-		private readonly IHandlerFactory handlerFactory;
+		private readonly IStratagyRepository handlerFactory;
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
 
@@ -43,7 +43,7 @@
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
 			var userId = request.Message.From.Id;
 			var context = await contextFactory.CreateContext(userId);
-			var handler = handlerFactory.GetHandlerForCommand(request.Message.Text);
+			var handler = handlerFactory.GetStratagyForCommand(request.Message.Text);
 
 			handler.Execute(context, request);
 		}

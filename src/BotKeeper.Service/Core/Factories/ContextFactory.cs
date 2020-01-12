@@ -18,21 +18,21 @@ namespace BotKeeper.Service.Core.Factories {
 			this.stateFactory = stateFactory ?? throw new ArgumentNullException(nameof(stateFactory));
 		}
 
-		public async Task<Context> CreateContext(long userId) {
+		public async Task<BotContext> CreateContext(long userId) {
 			var storedUserState = await storage.GetUserState(userId);
 
 			if (storedUserState.HasResult) {
 				var storedState = stateFactory.Create(storedUserState.Result, $"user {userId}");
-				return new Context(storedState, serviceFactory);
+				return new BotContext(storedState, serviceFactory);
 			} else {
 				var isUserExist = await userService.IsUserExist(userId);
 				if (isUserExist) {
 					var guestState = stateFactory.Create(typeof(GuestState));
-					return new Context(guestState, serviceFactory, userId);
+					return new BotContext(guestState, serviceFactory, userId);
 				}
 			}
 
-			return new Context(stateFactory.DefaultState, serviceFactory);
+			return new BotContext(stateFactory.DefaultState, serviceFactory);
 		}
 	}
 }

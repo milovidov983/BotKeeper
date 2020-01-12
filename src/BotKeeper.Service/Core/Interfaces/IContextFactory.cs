@@ -2,6 +2,6 @@
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IContextFactory {
-		Task<Context> CreateContext(long userId);
+		Task<BotContext> CreateContext(long userId);
 	}
 }
