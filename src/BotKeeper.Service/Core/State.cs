@@ -12,13 +12,38 @@ namespace BotKeeper.Service.Core {
             this.context = context;
         }
 
-        public abstract Task ShowHelp(MessageEventArgs request);
-        public abstract Task Initial(MessageEventArgs request);
-        public abstract Task Login(MessageEventArgs request);
-        public abstract Task Handle(MessageEventArgs request);
-        public abstract Task Register(MessageEventArgs request);
-        public abstract Task Save(MessageEventArgs request);
-        public abstract Task Yes(MessageEventArgs request);
-        public abstract Task No(MessageEventArgs request);
+        public virtual async Task ShowHelp(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+        public virtual async Task Initial(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+        public virtual async Task Login(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+        public virtual async Task Handle(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+        public virtual async Task Register(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+        public virtual async Task Save(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+
+        public virtual async Task Yes(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
+        public virtual async Task No(MessageEventArgs request) {
+            await Task.Yield();
+            // do nothing, write log
+        }
     }
 }

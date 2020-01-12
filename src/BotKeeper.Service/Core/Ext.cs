@@ -17,6 +17,8 @@ namespace BotKeeper.Service.Core.Helpers {
 			});
 		}
 
+		public static Task StartAsync()
+
 
 		public static string GetHash(this string value) {
 			return ComputeSha256Hash(value);

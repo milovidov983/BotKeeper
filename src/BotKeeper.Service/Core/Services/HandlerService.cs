@@ -8,6 +8,14 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.Services {
 	internal class HandlerService : IHandlerService {
 
+
+		/// <summary>
+		///  Переписать всё к херам! 
+		///  Брать рефлексивно команды из контекста и ими заполнять словарь, 
+		///  
+		///  а в анатациях хранить как вызывать команду(спорно) 
+		/// </summary>
+
 		protected Dictionary<Commands, Func<MessageEventArgs, Context, Task>> handlersMap
 			= new Dictionary<Commands, Func<MessageEventArgs, Context, Task>>();
 

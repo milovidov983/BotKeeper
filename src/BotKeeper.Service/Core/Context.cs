@@ -1,4 +1,5 @@
-﻿using BotKeeper.Service.Core.Interfaces;
+﻿using BotKeeper.Service.Core.Helpers;
+using BotKeeper.Service.Core.Interfaces;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
@@ -8,7 +9,7 @@ namespace BotKeeper.Service.Core {
         private readonly IStorage storage;
 
         public readonly ISender Sender;
-        public readonly IParserService ParserService;
+        public readonly IHandlerFactory ParserService;
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
 
@@ -42,17 +43,21 @@ namespace BotKeeper.Service.Core {
             await currentState.Initial(request);
         }
 
+        [Command(@"\help")]
         public async Task ShowHelp(MessageEventArgs request) {
             await currentState.ShowHelp(request);
         }
 
+        [Command(@"\register")]
         public async Task Register(MessageEventArgs request) {
             await currentState.Register(request);
-        }       
+        }
+        
         public async Task Handle(MessageEventArgs request) {
             await currentState.Handle(request);
         }
 
+        [Command(@"\login")]
         public async Task Login(MessageEventArgs request) {
             await currentState.Login(request);
         }

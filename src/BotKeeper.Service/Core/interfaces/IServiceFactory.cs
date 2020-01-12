@@ -2,7 +2,7 @@
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface IServiceFactory {
-		IParserService ParserService { get; }
+		IHandlerFactory HandlerFactory { get; }
 		ISender Sender { get; }
 		IStorage Storage { get; }
 		IUserService UserService { get; }

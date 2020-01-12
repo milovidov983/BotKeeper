@@ -13,7 +13,7 @@
 
 		private readonly TelegramBotClient client;
 		private readonly IServiceFactory serviceFactory;
-		private readonly IParserService parserService;
+		private readonly IHandlerFactory handlerFactory;
 		private readonly IHandlerService handlerService;
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
@@ -27,10 +27,9 @@
 
 			var sender = new SenderService(client);
 			serviceFactory = new ServiceFactory(storage, sender, Settings.Logger);
-			parserService = serviceFactory.ParserService;
+			handlerFactory = serviceFactory.ParserService;
 			handlerService = serviceFactory.HandlerService;
 			contextFactory = serviceFactory.ContextFactory;
-
 		}
 
 		public void Run() {
@@ -44,13 +43,16 @@
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
 			var userId = request.Message.From.Id;
 			var context = await contextFactory.CreateContext(userId);
-			var command = parserService.Parse(request.Message.Text);
+			var handler = handlerFactory.CreateHandlerForCommand(request.Message.Text);
 
-			await handlerService.HandleCommand(request, context, command);
+			handler.Execute(context, request);
+
+
+			//await command(new HandlerFactory.HandlerDto{
+			//	request = request,
+			//	context = context,
+			//	handler = command;
 		}
-
-
-
 
 		public void Dispose() {
 			Stop();

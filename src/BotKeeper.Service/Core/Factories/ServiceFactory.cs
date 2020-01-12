@@ -8,13 +8,13 @@ namespace BotKeeper.Service.Core.Services {
 	internal class ServiceFactory : IServiceFactory {
 		private readonly IStorage storage;
 		private readonly ILogger logger;
-		private readonly IParserService parserService;
+		private readonly IHandlerFactory parserService;
 		private readonly IUserService userService;
 		private readonly ISender sender;
 		private readonly IHandlerService handlerService;
 		private readonly IContextFactory contextFactory;
 
-		public IParserService ParserService  => parserService;
+		public IHandlerFactory HandlerFactory  => parserService;
 		public IUserService UserService => userService;
 		public IStorage Storage => storage;
 		public ISender Sender  => sender;
@@ -26,7 +26,7 @@ namespace BotKeeper.Service.Core.Services {
 			this.sender = sender;
 			this.storage = storage;
 			this.logger = logger;
-			parserService = new ParserService();
+			parserService = new HandlerFactory();
 			userService = new UserService(storage, logger);
 			handlerService = new HandlerService();
 
