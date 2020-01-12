@@ -1,6 +1,7 @@
 ﻿namespace BotKeeper.Service {
 	using BotKeeper.Service.Core;
     using BotKeeper.Service.Core.Factories;
+    using BotKeeper.Service.Core.Helpers;
     using BotKeeper.Service.Core.Interfaces;
 	using BotKeeper.Service.Core.Models;
 	using BotKeeper.Service.Core.Services;
@@ -41,12 +42,40 @@
 
 
 		private async void BotOnMessageReceived(object sender, MessageEventArgs request) {
-			var userId = request.Message.From.Id;
-			var context = await contextFactory.CreateContext(userId);
-			var handler = handlerFactory.GetStratagyForCommand(request.Message.Text);
+			logger.Trace($"Message received {request.Message.Text}");
 
-			handler.Execute(context, request);
+			try {
+				var userId = request.GetUserId();
+				var context = await contextFactory.CreateContext(userId);
+				var userTextMessage = request.GetClearedTextMessage();
+				var handler = handlerFactory.GetStratagyForCommand(userTextMessage);
+
+				handler.Execute(context, request);
+				logger.Trace($"Message processed  {request.Message.Text}");
+				return;
+
+			} catch (BotException botException) {
+				OnError(request, botException);
+			} catch (Exception exception) {
+				var internalException = BotException.CreateInternalException(exception);
+				OnError(request, internalException);
+			}
+
+			logger.Trace($"Message failed {request.Message.Text}");
 		}
+
+
+
+		private void OnError(MessageEventArgs request, BotException ex) {
+			if (ex.StatusCode == StatusCodes.InternalError) {
+				logger.Error(ex, request.ToJson());
+			} else {
+				logger.Warn(ex, request.ToJson());
+			}
+
+			/// Some additional logic
+		}
+
 
 		public void Dispose() {
 			Stop();

@@ -11,7 +11,7 @@ namespace BotKeeper.Service.Core.States {
 
 		public override async Task Handle(MessageEventArgs request) {
 			await Task.Yield();
-			var key = request.ClearTextMessage();
+			var key = request.GetClearedTextMessage();
 
 			if (key == string.Empty) {
 				context.Sender.Send("Your key must not be empty! Shall I create the key myself?(yes/no) ", request);

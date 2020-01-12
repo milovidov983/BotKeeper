@@ -39,14 +39,21 @@ namespace BotKeeper.Service.Core.Helpers {
 			}
 		}
 
-		public static long GetUserId(this MessageEventArgs messageEventArgs) {
-			return messageEventArgs.Message.From.Id;
+		public static long GetUserId(this MessageEventArgs request) {
+			if( request.Message.From.Id == default) {
+				throw new BotException($"UserId is not set.", StatusCodes.InvalidRequest);
+			}
+			return request.Message.From.Id;
 		}
 
 
 
-		public static string ClearTextMessage(this MessageEventArgs request) {
+		public static string GetClearedTextMessage(this MessageEventArgs request) {
 			return request.Message.Text?.Trim()?.ToLowerInvariant() ?? string.Empty;
-		}
+		}			
+		
+		public static string ToJson<T>(this T request) {
+			return JsonConvert.SerializeObject(request);
+		}		
 	}
 }
