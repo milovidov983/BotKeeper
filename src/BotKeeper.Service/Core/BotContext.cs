@@ -1,5 +1,6 @@
 ﻿using BotKeeper.Service.Core.Interfaces;
 using System.Threading.Tasks;
+using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
     internal class BotContext {
@@ -17,10 +18,11 @@ namespace BotKeeper.Service.Core {
         public readonly ICommandHandlerFactory HandlerFactory;
         public readonly IUserService UserService;
         public readonly IValidationService ValidationService;
+        public readonly MessageEventArgs Request;
 
-		public CommandController Commands { get; }
+        public CommandController Commands { get; }
 
-		public BotContext(State state, IServiceFactory serviceFactory, long? userId = null) {
+		public BotContext(State state, IServiceFactory serviceFactory, MessageEventArgs request, long? userId = null) {
             Commands = new CommandController(state);
             storage = serviceFactory.Storage;
 
@@ -33,6 +35,8 @@ namespace BotKeeper.Service.Core {
             } else {
                 TransitionTo(state);
             }
+
+            Request = request;
         }
 
         public async Task TransitionToAsync(State state, long userId) {

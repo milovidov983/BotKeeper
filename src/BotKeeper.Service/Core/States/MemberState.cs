@@ -8,9 +8,10 @@ namespace BotKeeper.Service.Core.States {
 		}
 
 		public override async Task Save(MessageEventArgs request) {
-			context.Sender.Send("Enter key:", request);
-			var saveKeyState = stateFactory.Create(typeof(SaveKeyState));
-			await context.TransitionToAsync(saveKeyState, request.Message.From.Id);
+			context.Sender.Send(@"Automatically assign an access key to an item?(\yes or \no ) ", request);
+
+			var createKeyState = stateFactory.Create(typeof(CreateKeyState));
+			await context.TransitionToAsync(createKeyState, request.Message.From.Id);
 		}
 
 		public override async Task ShowHelp(MessageEventArgs request) {

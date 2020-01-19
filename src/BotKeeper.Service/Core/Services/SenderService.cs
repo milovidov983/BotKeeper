@@ -9,12 +9,14 @@ namespace BotKeeper.Service.Core.Services {
 
 		private readonly TelegramBotClient client;
 		private readonly IMetricsService metricService;
+		private readonly MessageEventArgs request;
 
-		public SenderService(TelegramBotClient client, IMetricsService metricService) {
+		public SenderService(TelegramBotClient client, IMetricsService metricService, MessageEventArgs request) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 			this.metricService = metricService;
+			this.request = request;
 		}
-		public void Send(string textMessage, MessageEventArgs request) {
+		public void Send(string textMessage) {
 			var metricData = metricService.CreateMetricsFrom(textMessage, request);
 			
 			Ext.SafeRun(async () => 

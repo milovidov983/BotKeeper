@@ -1,4 +1,5 @@
-﻿using BotKeeper.Service.Core.Interfaces;
+﻿using BotKeeper.Service.Core.Factories;
+using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Core.Services;
 
 namespace BotKeeper.Service.Core.Interfaces {
@@ -10,5 +11,7 @@ namespace BotKeeper.Service.Core.Interfaces {
 		ILogger Logger { get; }
 		IContextFactory ContextFactory { get; }
 		IEmegencyService EmegencyService { get; }
+
+		ISenderFactory SenderFactory { get; set; }
 	}
 }

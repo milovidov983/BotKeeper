@@ -24,13 +24,13 @@ namespace BotKeeper.Service.Core.States {
                 bool isCreatedSuccess = await context.UserService.CreateNewAccount(userId);
                 if (isCreatedSuccess) {
                     context.Sender.Send("A new account has been created for you", request);
+                    var memberState = stateFactory.Create(typeof(MemberState));
+                    await context.TransitionToAsync(memberState, request.Message.From.Id);
                 } else {
                     context.Sender.Send("Error creating account", request);
                 }
-                var memberState = stateFactory.Create(typeof(MemberState));
-                await context.TransitionToAsync(memberState, request.Message.From.Id);
             } else {
-                context.Sender.Send("DefaultState: You registered yet. Redirect to GuestState", request);
+                context.Sender.Send("DefaultState: You registered yet. Redirect to MemberState", request);
                 var memberState = stateFactory.Create(typeof(MemberState));
                 await context.TransitionToAsync(memberState, request.Message.From.Id);
                 await commands.DefaultAction(request);
