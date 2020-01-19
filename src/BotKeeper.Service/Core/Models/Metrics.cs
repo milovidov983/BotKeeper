@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.Models {
@@ -26,7 +25,7 @@ namespace BotKeeper.Service.Core.Models {
 					{ nameof(metrics.Message), metrics.Message},
 					{ nameof(metrics.Request), JsonConvert.SerializeObject(metrics.Request)}
 				};
-		
+
 		}
 
 

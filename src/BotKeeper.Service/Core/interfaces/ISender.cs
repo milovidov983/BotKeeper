@@ -2,6 +2,6 @@
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface ISender {
-		void Send(string text);
+		void Send(string text, MessageEventArgs request = null);
 	}
 }

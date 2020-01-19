@@ -33,7 +33,7 @@ namespace BotKeeper.Service {
 
 				app.Stop();
 				logger.Info("Service stoped.");
-			} catch(Exception e) {
+			} catch (Exception e) {
 				logger.Error(e);
 			}
 		}

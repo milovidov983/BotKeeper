@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 
 namespace BotKeeper.Service.Core.Factories {
+	/// <summary>
+	/// TODO wtf?
+	/// </summary>
 	internal class FactoryHelper<TService> {
 		private readonly string env;
 		private readonly ILogger logger;

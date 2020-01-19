@@ -12,14 +12,14 @@ namespace BotKeeper.Service.Persistence.Db {
 	internal class StorageResult<T> : IStorageResult<T> {
 		private T result;
 		public bool HasResult { get; set; }
-		public T Result { 
+		public T Result {
 			get {
 				return result;
 			}
 			set {
 				result = value;
 				HasResult = true;
-			} 
+			}
 		}
 	}
 
@@ -57,7 +57,6 @@ namespace BotKeeper.Service.Persistence.Db {
 			await Task.Yield();
 			userStates.AddOrUpdate(id, state.GetType().Name, (_, oldState) => state.GetType().Name);
 		}
-
 		public async Task<IStorageResult<T>> Get<T>(long userId, string key) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
@@ -69,7 +68,6 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 			return new StorageResult<T>();
 		}
-
 		public async Task Save<T>(long userId, string key, T value) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
@@ -84,10 +82,9 @@ namespace BotKeeper.Service.Persistence.Db {
 				throw new BotException("User not found", StatusCodes.NotFound);
 			}
 		}
-
-		public async Task Save(long userId) {
+		public async Task CreateNewUser(long userId) {
 			await Task.Yield();
-			var isUserAdded = await CreateNewUser(userId);
+			var isUserAdded = await CreateUser(userId);
 
 			if (!isUserAdded) {
 				throw new BotException($"User {userId} already exists", StatusCodes.InvalidRequest);
@@ -97,14 +94,11 @@ namespace BotKeeper.Service.Persistence.Db {
 			if (!isUserStorageCreated) {
 				throw new BotException($"User storage {userId} already exists", StatusCodes.InvalidRequest);
 			}
-			
 		}
-
 		public async Task<IEnumerable<long>> GetAllUserIds() {
 			await Task.Yield();
 			return storage.Keys;
 		}
-
 		public async Task<IEnumerable<string>> GetAllKeys(long userId) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
@@ -113,12 +107,10 @@ namespace BotKeeper.Service.Persistence.Db {
 				throw new BotException("User not found", StatusCodes.NotFound);
 			}
 		}
-
 		public async Task<bool> IsUserExist(long id) {
 			await Task.Yield();
 			return users.ContainsKey(id);
 		}
-
 		public async Task<IStorageResult<PersistedUser>> GetUser(long id) {
 			await Task.Yield();
 			if (users.TryGetValue(id, out var persistedUser)) {
@@ -126,15 +118,33 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 			return new StorageResult<PersistedUser>();
 		}
+		public async Task SetUserKey(long id, string key) {
+			var user = await GetUser(id);
+			if (user.HasResult) {
+				user.Result.StorageData.UserDefinedKey = key;
+				UpdateUser(id, user.Result);
+			} else {
+				throw new BotException($"User {id} not found", StatusCodes.NotFound);
+			}
+		}
+
+
+
+
 
 		#endregion
 
 		#region Helpers
-		private async Task<bool> CreateNewUser(long id) {
+		private void UpdateUser(long id, PersistedUser user) {
+			users[id] = user;
+		}
+		private async Task<bool> CreateUser(long id) {
 			await Task.Yield();
 			var newUser = new PersistedUser {
 				Id = (int)id,
-				Type = UserType.Guest
+				RegisterationData = new RegisterationData {
+					Type = UserType.Guest
+				}
 			};
 			return users.TryAdd(id, newUser);
 		}

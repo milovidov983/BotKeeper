@@ -1,8 +1,6 @@
 ﻿using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 

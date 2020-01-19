@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class StateFactory : IStateFactory {
@@ -30,7 +29,7 @@ namespace BotKeeper.Service.Core.Factories {
 				statesInstances.Add(stateTypeInfo, stateInstance);
 			}
 
-			DefaultState = new DefaultState(this);
+			DefaultState = new DefaultState();
 
 			this.logger = logger;
 		}
@@ -61,8 +60,7 @@ namespace BotKeeper.Service.Core.Factories {
 		private State GetInstance(string fullyQualifiedName) {
 			// taken from here: https://stackoverflow.com/a/27119311/8840033
 			Type stateType = Type.GetType(fullyQualifiedName);
-			object[] args = { this };
-			return (State)Activator.CreateInstance(stateType, args);
+			return (State)Activator.CreateInstance(stateType);
 		}
 		#endregion
 

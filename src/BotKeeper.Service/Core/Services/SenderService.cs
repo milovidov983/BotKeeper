@@ -7,21 +7,23 @@ using Telegram.Bot.Args;
 namespace BotKeeper.Service.Core.Services {
 	internal class SenderService : ISender {
 
-		private readonly TelegramBotClient client;
+		private readonly ITelegramBotClient client;
 		private readonly IMetricsService metricService;
 		private readonly MessageEventArgs request;
 
-		public SenderService(TelegramBotClient client, IMetricsService metricService, MessageEventArgs request) {
+		public SenderService(ITelegramBotClient client, IMetricsService metricService, MessageEventArgs request) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 			this.metricService = metricService;
 			this.request = request;
 		}
-		public void Send(string textMessage) {
-			var metricData = metricService.CreateMetricsFrom(textMessage, request);
-			
-			Ext.SafeRun(async () => 
-				await client.SendTextMessageAsync(request.Message.From.Id, textMessage), 
-				metricData.ToDictionary()
+		public void Send(string response, MessageEventArgs request = null) {
+			var req = request ?? this.request ?? throw new ArgumentNullException(nameof(request));
+
+			Ext.SafeRun(async () =>
+				await client.SendTextMessageAsync(req.Message.From.Id, response),
+				metricService,
+				response,
+				request
 			);
 		}
 	}

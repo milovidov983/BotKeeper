@@ -6,8 +6,6 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
 	internal class CreateKeyState : State {
-		public CreateKeyState(IStateFactory stateFactory) : base(stateFactory) {
-		}
 
 		public override async Task DefaultAction(MessageEventArgs request) {
 			//await Task.Yield();
@@ -27,9 +25,8 @@ namespace BotKeeper.Service.Core.States {
 		}
 
 		public override async Task Yes(MessageEventArgs request) {
-			//var memberState = stateFactory.Create(typeof(MemberState));
-			//await context.TransitionToAsync(memberState, request.GetUserId());
-			//await commands.Save(request);
+			context.Sender.Send("Send a message to save. A message sent after this will be saved.");
+			await context.TransitionToAsync(typeof(SaveState), request.GetUserId());
 		}
 	}
 }

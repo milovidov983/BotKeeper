@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BotKeeper.Service": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "appenvironment": "develop"
+      }
+    }
+  }
+}

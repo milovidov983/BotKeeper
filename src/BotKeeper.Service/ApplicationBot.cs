@@ -1,36 +1,26 @@
 ﻿namespace BotKeeper.Service {
-	using BotKeeper.Service.Core;
-    using BotKeeper.Service.Core.Factories;
-    using BotKeeper.Service.Core.Helpers;
-    using BotKeeper.Service.Core.Interfaces;
+	using BotKeeper.Service.Core.Helpers;
+	using BotKeeper.Service.Core.Interfaces;
 	using BotKeeper.Service.Core.Models;
 	using BotKeeper.Service.Core.Services;
-	using BotKeeper.Service.Core.States;
 
 	using System;
-	using System.Threading.Tasks;
 	using Telegram.Bot;
 	using Telegram.Bot.Args;
-	internal class ApplicationBot: IDisposable {
+	internal class ApplicationBot : IDisposable {
 
-		private readonly TelegramBotClient client;
+		private readonly ITelegramBotClient client;
 		private readonly IServiceFactory serviceFactory;
 		private readonly ICommandHandlerFactory handlerFactory;
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
-		private readonly IEmegencyService emegencyService;
 
-		public ApplicationBot(TelegramBotClient client, IStorage storage) {
+		public ApplicationBot(ITelegramBotClient client, IStorage storage) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 
-			var metricFactory = new MetricsFactory(Settings.Instance.Env, Settings.Logger);
-			var metricService = metricFactory.Create();
-			var sender = new SenderService(client, metricService);
-
-			serviceFactory = new ServiceFactory(storage, sender, Settings.Logger);
+			serviceFactory = new ServiceFactory(storage, client, Settings.Logger);
 			handlerFactory = serviceFactory.HandlerFactory;
 			contextFactory = serviceFactory.ContextFactory;
-			emegencyService = serviceFactory.EmegencyService;
 
 			logger = Settings.Logger;
 		}
@@ -47,8 +37,7 @@
 			logger.Trace($"Message received {request.Message.Text}");
 
 			try {
-				var userId = request.GetUserId();
-				var context = await contextFactory.CreateContext(userId);
+				var context = await contextFactory.CreateContext(request);
 				var userTextMessage = request.GetClearedTextMessage();
 				var handler = handlerFactory.CreateHandlerForCommand(userTextMessage);
 
@@ -66,7 +55,7 @@
 			logger.Trace($"Message failed {request.Message.Text}");
 		}
 
-		private void  OnError(MessageEventArgs request, BotException ex) {
+		private void OnError(MessageEventArgs request, BotException ex) {
 			if (ex.StatusCode == StatusCodes.InternalError) {
 				logger.Error(ex, request.ToJson());
 			} else {
@@ -74,9 +63,22 @@
 			}
 
 			/// We assume that in the production version you do not need to send an error message to the chat
-			emegencyService.SendErrorMessage(request, ex);
+			if (!Settings.Instance.IsProd) {
+				SendFullError(request, ex);
+			} else {
+				SendShortError(request);
+			}
 		}
 
+		private void SendShortError(MessageEventArgs request) {
+			var sender = serviceFactory.SenderFactory.CreateSender(request);
+			sender.Send($"Something went wrong...");
+		}
+
+		private void SendFullError(MessageEventArgs request, BotException ex) {
+			var sender = serviceFactory.SenderFactory.CreateSender(request);
+			sender.Send($"Unhandled error: {ex.Message}", request);
+		}
 
 		public void Dispose() {
 			Stop();

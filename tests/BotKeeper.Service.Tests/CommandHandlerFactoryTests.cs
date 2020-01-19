@@ -10,7 +10,7 @@ namespace BotKeeper.Service.Tests {
 			var handlerFactory = new CommandHandlerFactory();
 
 			var handler = (IMethodName)handlerFactory.CreateHandlerForCommand("\\help");
-			
+
 			Assert.Equal(nameof(CommandController.ShowHelp), handler.MethodName);
 		}
 	}

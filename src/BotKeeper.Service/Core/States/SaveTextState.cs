@@ -1,17 +1,13 @@
 ﻿using BotKeeper.Service.Core.Factories;
 using BotKeeper.Service.Core.Helpers;
-using System;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class SaveKeyState : State {
-		public SaveKeyState(IStateFactory stateFactory) : base(stateFactory) {
-		}
-
+	internal class SaveTextState : State {
 		public override async Task DefaultAction(MessageEventArgs request) {
 			await Task.Yield();
-			var key = request.GetClearedTextMessage();
+			var key = request.Message.Text;
 
 			if (key == string.Empty) {
 				context.Sender.Send("Your key must not be empty! Shall I create the key myself?(yes/no) ", request);
@@ -21,8 +17,7 @@ namespace BotKeeper.Service.Core.States {
 		}
 
 		public override async Task No(MessageEventArgs request) {
-			var memberState = stateFactory.Create(typeof(MemberState));
-			await context.TransitionToAsync(memberState, request.GetUserId());
+			await context.TransitionToAsync(typeof(MemberState), request.GetUserId());
 			await commands.Save(request);
 		}
 	}

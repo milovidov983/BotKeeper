@@ -11,26 +11,44 @@ namespace BotKeeper.Service {
 		public static Settings Instance { get; set; }
 		public static ILogger Logger { get; set; }
 		public string Env { get; set; }
- 
-		static Settings(){
+
+		public bool IsProd { get; set; }
+
+		static Settings() {
+			SetTitle();
+
 			Instance = new Settings {
 				ApiKey = Environment.GetEnvironmentVariable("botapikey")
+							?? EnvException("botapikey", nameof(ApiKey)),
+				Env = Environment.GetEnvironmentVariable("appenvironment")
+							?? EnvException("appenvironment", nameof(Env)),
 			};
+
+			Instance.IsProd = Instance.Env.Equals(AllEnvironments.Production);
+
 			Logger = new ConsoleLogger(true);
+		}
+
+		private static void SetTitle() {
 			var appVersion = GetProductVersion();
 			Console.Title = $"{appId} {appVersion}";
 		}
+
+		private static string EnvException(string env, string fieldName) {
+			throw new ApplicationException($"Failed to initialize settings parameter {nameof(Settings)}.{fieldName}, "
+											+ $"environment variable not found: \"{env}\"!");
+		}
+
 		public static string GetProductVersion() {
 			var attribute = (AssemblyInformationalVersionAttribute)Assembly
 				.GetExecutingAssembly()
 				.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), true)
 				.Single();
 			return attribute.InformationalVersion;
-			
 		}
 
 
-		public class Environments {
+		public class AllEnvironments {
 			public const string Test = "test";
 			public const string Develop = "develop";
 			public const string Production = "production";

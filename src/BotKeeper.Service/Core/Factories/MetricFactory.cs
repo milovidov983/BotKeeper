@@ -1,6 +1,5 @@
 ﻿using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Core.Services;
-using System;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class MetricsFactory : IMetricsFactory {
@@ -10,9 +9,9 @@ namespace BotKeeper.Service.Core.Factories {
 			var defaultService = new TestMetricsService();
 			helper = new FactoryHelper<IMetricsService>(defaultService, logger, env);
 
-			helper.InitFactory(Settings.Environments.Test, defaultService);
-			helper.InitFactory(Settings.Environments.Develop, defaultService);
-			helper.InitFactory(Settings.Environments.Production, new ProdMetricsService());
+			helper.InitFactory(Settings.AllEnvironments.Test, defaultService);
+			helper.InitFactory(Settings.AllEnvironments.Develop, defaultService);
+			helper.InitFactory(Settings.AllEnvironments.Production, new ProdMetricsService());
 		}
 
 		public IMetricsService Create() {

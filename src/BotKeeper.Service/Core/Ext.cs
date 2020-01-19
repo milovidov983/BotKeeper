@@ -1,4 +1,5 @@
 ﻿using BotKeeper.Service.Core.Models;
+using BotKeeper.Service.Core.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,8 +9,24 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.Helpers {
-	public  static class Ext {
-		public static void SafeRun(Func<Task> action, Dictionary<string, object> metrics = null) {
+	internal static class Ext {
+
+
+		public static void SafeRun(Func<Task> action, IMetricsService metricService, string response, MessageEventArgs request) {
+			Task.Run(async () => {
+				IMetrics metrics = null;
+				try {
+					await action.Invoke();
+				} catch (Exception e) {
+					metrics = metricService.CreateMetricsFrom(response, request);
+					Settings.Logger.Error(e, metrics);
+				}
+				metrics ??= metricService.CreateMetricsFrom(response, request);
+				Settings.Logger.Trace("Task completed successfully:\n", metrics);
+			});
+		}
+
+		public static void SafeRun(Func<Task> action, Dictionary<string, object> metrics) {
 			Task.Run(async () => {
 				try {
 					await action.Invoke();
@@ -20,7 +37,6 @@ namespace BotKeeper.Service.Core.Helpers {
 			});
 		}
 
-	
 
 		public static string GetHash(this string value) {
 			return ComputeSha256Hash(value);
@@ -40,7 +56,7 @@ namespace BotKeeper.Service.Core.Helpers {
 		}
 
 		public static long GetUserId(this MessageEventArgs request) {
-			if( request.Message.From.Id == default) {
+			if (request.Message.From.Id == default) {
 				throw new BotException($"UserId is not set.", StatusCodes.InvalidRequest);
 			}
 			return request.Message.From.Id;
@@ -50,10 +66,14 @@ namespace BotKeeper.Service.Core.Helpers {
 
 		public static string GetClearedTextMessage(this MessageEventArgs request) {
 			return request.Message.Text?.Trim()?.ToLowerInvariant() ?? string.Empty;
-		}			
-		
+		}
+
+		public static string GetClearedTextMessage(this string text) {
+			return text?.Trim()?.ToLowerInvariant() ?? string.Empty;
+		}
+
 		public static string ToJson<T>(this T request) {
 			return JsonConvert.SerializeObject(request);
-		}		
+		}
 	}
 }

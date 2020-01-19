@@ -8,11 +8,11 @@ namespace BotKeeper.Service.Infrastructure {
 
 	internal class ConsoleLogger : ILogger {
 		private readonly bool logTime;
-		
-		private string Time() => logTime 
+
+		private string Time() => logTime
 			? $"{DateTime.UtcNow.ToLongTimeString()}"
 			: string.Empty;
-		
+
 
 		public ConsoleLogger(bool logTime) {
 			this.logTime = logTime;
@@ -21,8 +21,8 @@ namespace BotKeeper.Service.Infrastructure {
 		public void Error(Exception ex, string message) {
 			Console.WriteLine($"{Time()} Error: {ex.Message}, {message}");
 			//todo requestMessage
-		}		
-		
+		}
+
 		public void Error(Exception ex, IMetrics metrics) {
 			Console.WriteLine($"{Time()} Error: {ex.Message}, {CreateLoggerInfo(metrics)}");
 			//todo requestMessage
@@ -43,7 +43,7 @@ namespace BotKeeper.Service.Infrastructure {
 		public void Trace(string text) {
 			Console.WriteLine($"{Time()} Trace: {text}");
 		}
-	
+
 
 		public void Warn(Exception ex, string message) {
 			Console.WriteLine($"{Time()} Warn: {ex.Message}, {message}");
@@ -55,8 +55,8 @@ namespace BotKeeper.Service.Infrastructure {
 
 		public void Trace(string title, Dictionary<string, object> requestInfo) {
 			Console.WriteLine($"{Time()} Trace: {title}\n{JsonConvert.SerializeObject(requestInfo)}");
-		}		
-		
+		}
+
 		public void Trace(string title, IMetrics metrics = null) {
 			Console.WriteLine($"{Time()} Trace: {title}\n{CreateLoggerInfo(metrics)}");
 		}
