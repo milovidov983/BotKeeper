@@ -1,5 +1,8 @@
 ﻿using BotKeeper.Service.Core.Interfaces;
 using BotKeeper.Service.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -7,12 +10,12 @@ using System.Reflection;
 namespace BotKeeper.Service {
 	internal class Settings {
 		public const string appId = "BotKeeper.Service";
-		public string ApiKey { get; set; }
 		public static Settings Instance { get; set; }
 		public static ILogger Logger { get; set; }
+		public string ApiKey { get; set; }
 		public string Env { get; set; }
-
 		public bool IsProd { get; set; }
+		public static JsonSerializerSettings JSS { get; set; }
 
 		static Settings() {
 			SetTitle();
@@ -27,6 +30,16 @@ namespace BotKeeper.Service {
 			Instance.IsProd = Instance.Env.Equals(AllEnvironments.Production);
 
 			Logger = new ConsoleLogger(true);
+
+
+			JSS = new JsonSerializerSettings {
+				NullValueHandling = NullValueHandling.Ignore,
+				ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+			};
+			JSS.ContractResolver = new CamelCasePropertyNamesContractResolver();
+			JSS.Converters.Add(new StringEnumConverter() {
+				NamingStrategy = new CamelCaseNamingStrategy()
+			});
 		}
 
 		private static void SetTitle() {

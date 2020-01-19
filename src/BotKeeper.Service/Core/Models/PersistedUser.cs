@@ -17,5 +17,6 @@
 
 	internal class StorageData {
 		public string UserDefinedKey { get; set; }
+		public string LastKey { get; set; }
 	}
 }

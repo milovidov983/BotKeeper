@@ -24,7 +24,7 @@ namespace BotKeeper.Service {
 				logger.Info($"Bot id: {me.Id} name is {me.FirstName}.");
 
 				using var store = new Storage();
-				var app = new ApplicationBot(telegramClient, store);
+				var app = new ApplicationBot(telegramClient, store, Settings.Instance, logger);
 				app.Run();
 
 

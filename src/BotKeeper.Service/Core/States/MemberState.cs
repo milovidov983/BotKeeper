@@ -16,5 +16,11 @@ namespace BotKeeper.Service.Core.States {
 			context.Sender.Send("Help VerifiedUser!");
 			await Task.Yield();
 		}
+
+		public override async Task Get(MessageEventArgs request) {
+			// TODO \last (number)
+			context.Sender.Send(@"\last OR \keys");
+			await context.TransitionToAsync(typeof(GetState), request.Message.From.Id);
+		}
 	}
 }

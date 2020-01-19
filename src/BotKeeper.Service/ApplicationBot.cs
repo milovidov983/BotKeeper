@@ -14,15 +14,17 @@
 		private readonly ICommandHandlerFactory handlerFactory;
 		private readonly IContextFactory contextFactory;
 		private readonly ILogger logger;
+		private readonly Settings settings;
 
-		public ApplicationBot(ITelegramBotClient client, IStorage storage) {
+		public ApplicationBot(ITelegramBotClient client, IStorage storage, Settings settings, ILogger logger) {
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
 
 			serviceFactory = new ServiceFactory(storage, client, Settings.Logger);
 			handlerFactory = serviceFactory.HandlerFactory;
 			contextFactory = serviceFactory.ContextFactory;
 
-			logger = Settings.Logger;
+			this.logger = logger;
+			this.settings = settings;
 		}
 
 		public void Run() {
@@ -63,10 +65,10 @@
 			}
 
 			/// We assume that in the production version you do not need to send an error message to the chat
-			if (!Settings.Instance.IsProd) {
-				SendFullError(request, ex);
-			} else {
+			if (settings.IsProd) {
 				SendShortError(request);
+			} else {
+				SendFullError(request, ex);
 			}
 		}
 

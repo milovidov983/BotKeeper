@@ -23,6 +23,7 @@ namespace BotKeeper.Service.Core.Factories.Users {
 				SaveState _ => new SaveContextUserService(storage),
 				DefaultState _ => new RegistrationContextUserService(storage, logger),
 				InitState _ => new InitUserService(storage),
+				GetState _ => new GetContextUserService(storage),
 				_ => throw new Exception($"{nameof(currentState)}:{currentState}")
 			};
 		}

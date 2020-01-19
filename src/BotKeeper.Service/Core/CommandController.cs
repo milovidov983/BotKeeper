@@ -17,11 +17,6 @@ namespace BotKeeper.Service.Core {
 			await CurrentState.DefaultAction(request);
 		}
 
-		[Command(AllCommands.Init)]
-		public async Task InitialState(MessageEventArgs request) {
-			await CurrentState.Initial(request);
-		}
-
 		[Command(AllCommands.Help)]
 		public async Task ShowHelp(MessageEventArgs request) {
 			await CurrentState.ShowHelp(request);
@@ -45,6 +40,10 @@ namespace BotKeeper.Service.Core {
 		[Command(AllCommands.No)]
 		public async Task No(MessageEventArgs request) {
 			await CurrentState.No(request);
+		}
+		[Command(AllCommands.Get)]
+		public async Task Get(MessageEventArgs request) {
+			await CurrentState.Get(request);
 		}
 	}
 }

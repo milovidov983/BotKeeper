@@ -15,5 +15,6 @@ namespace BotKeeper.Service.Core.Interfaces {
 		Task SetUserState(long id, State state);
 		Task<IStorageResult<string>> GetUserState(long id);
 		Task SetUserKey(long id, string key);
+		Task SetLastKey(long id, string key);
 	}
 }

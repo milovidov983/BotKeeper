@@ -71,7 +71,7 @@ namespace BotKeeper.Service.Persistence.Db {
 		public async Task Save<T>(long userId, string key, T value) {
 			await Task.Yield();
 			if (storage.TryGetValue(userId, out var userStorage)) {
-				var json = JsonConvert.SerializeObject(value);
+				var json = Serialize(value);
 				var isSaveStatusOk = userStorage.TryAdd(key, json);
 				if (isSaveStatusOk) {
 					return;
@@ -127,6 +127,15 @@ namespace BotKeeper.Service.Persistence.Db {
 				throw new BotException($"User {id} not found", StatusCodes.NotFound);
 			}
 		}
+		public async Task SetLastKey(long id, string key) {
+			var user = await GetUser(id);
+			if (user.HasResult) {
+				user.Result.StorageData.LastKey = key;
+				UpdateUser(id, user.Result);
+			} else {
+				throw new BotException($"User {id} not found", StatusCodes.NotFound);
+			}
+		}
 
 
 
@@ -148,10 +157,13 @@ namespace BotKeeper.Service.Persistence.Db {
 			};
 			return users.TryAdd(id, newUser);
 		}
-
 		private async Task<bool> CreateUserStorage(long userId) {
 			await Task.Yield();
 			return storage.TryAdd(userId, new ConcurrentDictionary<string, string>());
+		}
+
+		private string Serialize<T>(T value) {
+			return JsonConvert.SerializeObject(value, Settings.JSS);
 		}
 		#endregion
 
@@ -161,9 +173,9 @@ namespace BotKeeper.Service.Persistence.Db {
 		private readonly string fileUsers = @"users.json";
 		private readonly string fileUserStates = @"userStates.json";
 		public async Task SaveDbToFileSystem() {
-			var dbJson = JsonConvert.SerializeObject(storage);
-			var usersJson = JsonConvert.SerializeObject(users);
-			var userStatesJson = JsonConvert.SerializeObject(userStates);
+			var dbJson = Serialize(storage);
+			var usersJson = Serialize(users);
+			var userStatesJson = Serialize(userStates);
 
 			using StreamWriter dbSw = File.CreateText(fileDb);
 			using StreamWriter usersSw = File.CreateText(fileUsers);
@@ -199,6 +211,8 @@ namespace BotKeeper.Service.Persistence.Db {
 			File.CreateText(path).Close();
 			return string.Empty;
 		}
+
+
 
 		#endregion
 

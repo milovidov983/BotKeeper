@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BotKeeper.Service.Core.Services {
-	internal class SaveContextUserService : ISaveContextUserService {
+	internal class GetContextUserService : IGetContextUserService {
 		private readonly IStorage storage;
-		public SaveContextUserService(IStorage storage) {
+		public GetContextUserService(IStorage storage) {
 			this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
 		}
 
@@ -21,19 +21,26 @@ namespace BotKeeper.Service.Core.Services {
 			return mock;
 		}
 
-		public async Task<string> SaveUserData(long userId, string data) {
-			var key = await GetUserDefinedKey(userId) ?? Guid.NewGuid().ToString();
-			await storage.Save(userId, key, data);
-			await storage.SetLastKey(userId, key);
-			return key;
+		public async Task<string> GetLast(long userId) {
+			var key = await GetUserLastKey(userId);
+			if(key is null) {
+				return null;
+			}
+
+			var data = await storage.Get<string>(userId, key);
+			if (data.HasResult) {
+				return data.Result;
+			}
+
+			return null;
 		}
 
-		private async Task<string> GetUserDefinedKey(long userId) {
+		private async Task<string> GetUserLastKey(long userId) {
 			var persistedUser = await storage.GetUser(userId);
 			if (!persistedUser.HasResult) {
 				throw new ApplicationException($"User {userId} not found!");
 			}
-			return persistedUser.Result.StorageData?.UserDefinedKey;
+			return persistedUser.Result.StorageData?.LastKey;
 		}
 	}
 }
