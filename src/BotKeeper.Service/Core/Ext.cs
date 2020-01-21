@@ -10,8 +10,6 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.Helpers {
 	internal static class Ext {
-
-
 		public static void SafeRun(Func<Task> action, IMetricsService metricService, string response, MessageEventArgs request) {
 			Task.Run(async () => {
 				IMetrics metrics = null;

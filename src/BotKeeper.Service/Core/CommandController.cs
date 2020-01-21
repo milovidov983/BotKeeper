@@ -5,8 +5,6 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
 	internal class CommandController {
-
-
 		public State CurrentState;
 
 		public CommandController(State state) {

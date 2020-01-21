@@ -5,8 +5,6 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
 	internal class DefaultState : State {
-
-
 		public IRegistrationContextUserService GetUserService( ) {
 			return (IRegistrationContextUserService)
 				context.UserServiceFactory.CreateUserService(this);
@@ -29,13 +27,13 @@ namespace BotKeeper.Service.Core.States {
 				bool isCreatedSuccess = await userService.CreateNewAccount(userId);
 				if (isCreatedSuccess) {
 					context.Sender.Send("A new account has been created for you");
-					await context.TransitionToAsync(typeof(MemberState), request.Message.From.Id);
+					await context.TransitionToAsync(typeof(MemberState), userId);
 				} else {
 					context.Sender.Send("Error creating account", request);
 				}
 			} else {
-				context.Sender.Send("DefaultState: You registered yet. Redirect to MemberState");
-				await context.TransitionToAsync(typeof(MemberState), request.Message.From.Id);
+				context.Sender.Send("DefaultState: You registered yet.");
+				await context.TransitionToAsync(typeof(MemberState), userId);
 				await commands.DefaultAction(request);
 			}
 		}
