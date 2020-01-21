@@ -8,6 +8,7 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.Factories {
 
+
 	internal class ContextFactory : IContextFactory {
 		private readonly IStorage storage;
 		private readonly IServiceFactory serviceFactory;
@@ -36,7 +37,7 @@ namespace BotKeeper.Service.Core.Factories {
 				current = await CreateMemberContext(request, userId);
 			}
 
-			if (IsNotInit(current)) {
+			if (current.IsNotInit()) {
 				current = CreateDefaultContext(request);
 			}
 
@@ -52,9 +53,7 @@ namespace BotKeeper.Service.Core.Factories {
 			return current;
 		}
 
-		private bool IsNotInit((State state, BotContext context) current) {
-			return current.state is null;
-		}
+
 
 		private async Task<(State state, BotContext context)> CreateMemberContext(
 			MessageEventArgs request,
@@ -80,7 +79,12 @@ namespace BotKeeper.Service.Core.Factories {
 			return contextState;
 		}
 		#endregion
+	}
 
+	internal static class ContextFactoryExt {
+		public static bool IsNotInit(this (State state, BotContext context) current) {
+			return current.state is null;
+		}
 
 	}
 }
