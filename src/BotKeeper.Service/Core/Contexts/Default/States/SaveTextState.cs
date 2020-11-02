@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class SaveTextState : State {
+	internal class SaveTextState : AbstractStateDefault {
 		public override async Task DefaultAction(MessageEventArgs request) {
 			await Task.Yield();
 			var key = request.Message.Text;

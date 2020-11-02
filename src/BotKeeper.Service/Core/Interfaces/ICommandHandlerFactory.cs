@@ -2,6 +2,7 @@
 
 namespace BotKeeper.Service.Core.Interfaces {
 	internal interface ICommandHandlerFactory {
-		ICommandHandler CreateHandlerForCommand(string command);
+		ICommandHandler CreateHandler(string command);
+		ICommandHandler CreateHandlerForCommand(BotContext context, string userTextMessage);
 	}
 }

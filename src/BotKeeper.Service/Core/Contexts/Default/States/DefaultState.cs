@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class DefaultState : State {
+	internal class DefaultState : AbstractStateDefault {
 		public IRegistrationContextUserService GetUserService( ) {
 			return (IRegistrationContextUserService)
 				context.UserServiceFactory.CreateUserService(this);

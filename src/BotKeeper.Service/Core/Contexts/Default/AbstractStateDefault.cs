@@ -1,12 +1,13 @@
-﻿using BotKeeper.Service.Core.Factories;
+﻿using BotKeeper.Service.Core.Contexts;
+using BotKeeper.Service.Core.Factories;
 using System;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
-	internal abstract class State {
+	internal abstract class AbstractStateDefault : IBaseState {
 		protected BotContext context;
-		protected CommandController commands;
+		protected DefaultContext commands;
 		public string CurrentState {
 			get {
 				return this.GetType().Name;
@@ -52,7 +53,5 @@ namespace BotKeeper.Service.Core {
 			await Task.Yield();
 			// do nothing, write log
 		}
-
-
 	}
 }

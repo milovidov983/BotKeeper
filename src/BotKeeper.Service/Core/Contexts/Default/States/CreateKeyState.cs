@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class CreateKeyState : State {
+	internal class CreateKeyState : AbstractStateDefault {
 
 		public override async Task DefaultAction(MessageEventArgs request) {
 			//await Task.Yield();

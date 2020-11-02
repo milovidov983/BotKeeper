@@ -40,8 +40,10 @@
 
 			try {
 				var context = await contextFactory.CreateContext(request);
+				// TODO determine user
+				// if this user is registered determine message else parse text message
 				var userTextMessage = request.GetClearedTextMessage();
-				var handler = handlerFactory.CreateHandlerForCommand(userTextMessage);
+				var handler = handlerFactory.CreateHandler(userTextMessage);
 
 				handler.Execute(context, request);
 				logger.Trace($"Message processed  {request.Message.Text}");

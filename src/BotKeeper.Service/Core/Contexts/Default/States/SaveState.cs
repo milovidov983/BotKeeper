@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class SaveState : State {
+	internal class SaveState : AbstractStateDefault {
 
 
 		private ISaveContextUserService GetUserService() {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class MemberState : State {
+	internal class MemberState : AbstractStateDefault {
 
 		public override async Task Save(MessageEventArgs request) {
 			context.Sender.Send(@"Automatically assign an access key to an item?(\yes or \no ) ");

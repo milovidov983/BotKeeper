@@ -7,7 +7,7 @@ namespace BotKeeper.Service.Core.States {
 	/// <summary>
 	/// Fake state for FactoryContexts
 	/// </summary>
-	internal class InitState : State {
+	internal class InitState : AbstractStateDefault {
 
 	}
 }

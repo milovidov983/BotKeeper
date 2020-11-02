@@ -17,7 +17,7 @@ namespace BotKeeper.Service.Core.Factories.Users {
 			this.logger = logger;
 		}
 
-		public IUserService CreateUserService(State currentState) {
+		public IUserService CreateUserService(AbstractStateDefault currentState) {
 			return currentState switch
 			{
 				SaveState _ => new SaveContextUserService(storage),

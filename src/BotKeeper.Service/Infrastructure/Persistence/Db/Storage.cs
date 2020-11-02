@@ -53,7 +53,7 @@ namespace BotKeeper.Service.Persistence.Db {
 			}
 			return new StorageResult<string>();
 		}
-		public async Task SetUserState(long id, State state) {
+		public async Task SetUserState(long id, AbstractStateDefault state) {
 			await Task.Yield();
 			userStates.AddOrUpdate(id, state.GetType().Name, (_, oldState) => state.GetType().Name);
 		}

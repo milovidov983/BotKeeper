@@ -1,13 +1,17 @@
-﻿using BotKeeper.Service.Core.Helpers;
+﻿using BotKeeper.Service.Core.Contexts;
+using BotKeeper.Service.Core.Helpers;
 using BotKeeper.Service.Core.Models;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
-	internal class CommandController {
-		public State CurrentState;
 
-		public CommandController(State state) {
+	internal class DefaultContext : BaseContext {
+
+		public AbstractStateDefault CurrentState { get; set; }
+
+
+		public DefaultContext(AbstractStateDefault state) {
 			CurrentState = state;
 		}
 

@@ -7,19 +7,19 @@ using System.Reflection;
 
 namespace BotKeeper.Service.Core.Factories {
 	internal class StateFactory : IStateFactory {
-		private readonly Dictionary<Type, State> statesInstances
-			= new Dictionary<Type, State>();
+		private readonly Dictionary<Type, AbstractStateDefault> statesInstances
+			= new Dictionary<Type, AbstractStateDefault>();
 
 		private readonly Dictionary<string, Type> namesTypesMap
 				= new Dictionary<string, Type>();
 
 		private readonly ILogger logger;
 
-		public State DefaultState { get; private set; }
+		public AbstractStateDefault DefaultState { get; private set; }
 		public StateFactory(ILogger logger) {
-			var statesInheritors = Assembly.GetAssembly(typeof(State))
+			var statesInheritors = Assembly.GetAssembly(typeof(AbstractStateDefault))
 											.GetTypes()
-											.Where(type => type.IsSubclassOf(typeof(State)))
+											.Where(type => type.IsSubclassOf(typeof(AbstractStateDefault)))
 											.Where(type => type != typeof(DefaultState));
 
 			foreach (var stateTypeInfo in statesInheritors) {
@@ -34,7 +34,7 @@ namespace BotKeeper.Service.Core.Factories {
 			this.logger = logger;
 		}
 
-		public State Create(string stateName, string requestContext = "") {
+		public AbstractStateDefault Create(string stateName, string requestContext = "") {
 			if (namesTypesMap.TryGetValue(stateName ?? string.Empty, out var stateInstance)) {
 				return Create(stateInstance, requestContext);
 			}
@@ -44,7 +44,7 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 
-		public State Create(Type stateType, string requestContext = "") {
+		public AbstractStateDefault Create(Type stateType, string requestContext = "") {
 			if (statesInstances.TryGetValue(stateType ?? typeof(object), out var stateInstance)) {
 				return stateInstance;
 			}
@@ -54,13 +54,13 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		#region Helpers
-		private State CreateInstanceOf(Type stateTypeInfo) {
+		private AbstractStateDefault CreateInstanceOf(Type stateTypeInfo) {
 			return GetInstance(stateTypeInfo.AssemblyQualifiedName);
 		}
-		private State GetInstance(string fullyQualifiedName) {
+		private AbstractStateDefault GetInstance(string fullyQualifiedName) {
 			// taken from here: https://stackoverflow.com/a/27119311/8840033
 			Type stateType = Type.GetType(fullyQualifiedName);
-			return (State)Activator.CreateInstance(stateType);
+			return (AbstractStateDefault)Activator.CreateInstance(stateType);
 		}
 		#endregion
 

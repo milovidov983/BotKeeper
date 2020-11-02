@@ -9,9 +9,9 @@ namespace BotKeeper.Service.Tests {
 		public void CreateHelpHandler_ReturnHelpHandler() {
 			var handlerFactory = new CommandHandlerFactory();
 
-			var handler = (IMethodName)handlerFactory.CreateHandlerForCommand("\\help");
+			var handler = (IMethodName)handlerFactory.CreateHandler("\\help");
 
-			Assert.Equal(nameof(CommandController.ShowHelp), handler.MethodName);
+			Assert.Equal(nameof(DefaultContext.ShowHelp), handler.MethodName);
 		}
 	}
 }

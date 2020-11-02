@@ -27,7 +27,7 @@ namespace BotKeeper.Service.Core.Factories {
 		/// If the state is not saved, create the state in accordance with the rules.
 		/// </summary>
 		public async Task<BotContext> CreateContext(MessageEventArgs request) {
-			(State state, BotContext context) current;
+			(AbstractStateDefault state, BotContext context) current;
 			var userId = request.GetUserId();
 			var storedUserState = await userService.GetUserState(userId);
 
@@ -46,8 +46,8 @@ namespace BotKeeper.Service.Core.Factories {
 		}
 
 		#region Helpers
-		private (State state, BotContext context) CreateDefaultContext(MessageEventArgs request) {
-			(State state, BotContext context) current = (null, null);
+		private (AbstractStateDefault state, BotContext context) CreateDefaultContext(MessageEventArgs request) {
+			(AbstractStateDefault state, BotContext context) current = (null, null);
 			current.state = stateFactory.DefaultState;
 			current.context = new BotContext(current.state, serviceFactory, request);
 			return current;
@@ -55,11 +55,11 @@ namespace BotKeeper.Service.Core.Factories {
 
 
 
-		private async Task<(State state, BotContext context)> CreateMemberContext(
+		private async Task<(AbstractStateDefault state, BotContext context)> CreateMemberContext(
 			MessageEventArgs request,
 			long userId) {
 
-			(State state, BotContext context) contextState = (null, null);
+			(AbstractStateDefault state, BotContext context) contextState = (null, null);
 			var isUserExist = await userService.IsUserExist(userId);
 			if (isUserExist) {
 				contextState.state = stateFactory.Create(typeof(MemberState));
@@ -68,12 +68,12 @@ namespace BotKeeper.Service.Core.Factories {
 			return contextState;
 		}
 
-		private (State state, BotContext context) CreateStoredStateContext(
+		private (AbstractStateDefault state, BotContext context) CreateStoredStateContext(
 			MessageEventArgs request,
 			long userId, string
 			storedUserState) {
 
-			(State state, BotContext context) contextState;
+			(AbstractStateDefault state, BotContext context) contextState;
 			contextState.state = stateFactory.Create(storedUserState, $"user {userId}");
 			contextState.context = new BotContext(contextState.state, serviceFactory, request, userId);
 			return contextState;
@@ -82,7 +82,7 @@ namespace BotKeeper.Service.Core.Factories {
 	}
 
 	internal static class ContextFactoryExt {
-		public static bool IsNotInit(this (State state, BotContext context) current) {
+		public static bool IsNotInit(this (AbstractStateDefault state, BotContext context) current) {
 			return current.state is null;
 		}
 

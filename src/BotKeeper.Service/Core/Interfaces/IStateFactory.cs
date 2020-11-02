@@ -2,8 +2,8 @@
 
 namespace BotKeeper.Service.Core.Factories {
 	internal interface IStateFactory {
-		State Create(string stateName, string requestContext = "");
-		State Create(Type stateType, string requestContext = "");
-		State DefaultState { get; }
+		AbstractStateDefault Create(string stateName, string requestContext = "");
+		AbstractStateDefault Create(Type stateType, string requestContext = "");
+		AbstractStateDefault DefaultState { get; }
 	}
 }

@@ -7,9 +7,9 @@ using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core {
 	internal class BotContext {
-		private State currentState;
+		private AbstractStateDefault currentState;
 		private readonly IStorage storage;
-		private State CurrentState {
+		private AbstractStateDefault CurrentState {
 			get => currentState;
 			set {
 				Commands.CurrentState = value;
@@ -26,7 +26,7 @@ namespace BotKeeper.Service.Core {
 		private readonly IStateFactory stateFactory;
 		private long? userId;
 
-		public CommandController Commands { get; }
+		public DefaultContext Commands { get; }
 		/// <summary>
 		/// Main user context
 		/// </summary>
@@ -34,9 +34,9 @@ namespace BotKeeper.Service.Core {
 		/// <param name="serviceFactory">services</param>
 		/// <param name="request">user request</param>
 		/// <param name="userId">variable is not null if the state is cached</param>
-		public BotContext(State state, IServiceFactory serviceFactory, MessageEventArgs request, long? userId = null) {
+		public BotContext(AbstractStateDefault state, IServiceFactory serviceFactory, MessageEventArgs request, long? userId = null) {
 			this.userId = userId;
-			Commands = new CommandController(state);
+			Commands = new DefaultContext(state);
 			storage = serviceFactory.Storage;
 			UserServiceFactory = serviceFactory.UserServiceFactory;
 			Sender = serviceFactory.SenderFactory.CreateSender(request);
@@ -45,7 +45,7 @@ namespace BotKeeper.Service.Core {
 			Request = request;
 		}
 
-		public async Task<BotContext> MakeTransitionTo(State state) {
+		public async Task<BotContext> MakeTransitionTo(AbstractStateDefault state) {
 			if (userId.HasValue) {
 				await TransitionToAsync(state, userId.Value);
 			} else {
@@ -55,7 +55,7 @@ namespace BotKeeper.Service.Core {
 			return this;
 		}
 
-		private async Task TransitionToAsync(State state, long userId) {
+		private async Task TransitionToAsync(AbstractStateDefault state, long userId) {
 			CurrentState = state;
 			await SaveCurrentUserState(state, userId);
 			CurrentState.SetContext(this);
@@ -66,11 +66,11 @@ namespace BotKeeper.Service.Core {
 			await TransitionToAsync(currentState, userId);
 		}
 
-		private void TransitionTo(State state) {
+		private void TransitionTo(AbstractStateDefault state) {
 			CurrentState = state;
 			CurrentState.SetContext(this);
 		}
-		private async Task SaveCurrentUserState(State state, long userId) {
+		private async Task SaveCurrentUserState(AbstractStateDefault state, long userId) {
 			await storage.SetUserState(userId, state);
 		}
 	}

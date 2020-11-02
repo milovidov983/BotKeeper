@@ -1,18 +1,21 @@
 ﻿using BotKeeper.Service.Core.Factories;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 
 namespace BotKeeper.Service.Core.States {
-	internal class RegisterState : State {
-		private Dictionary<long, int> count = new Dictionary<long, int>();
+	internal class AdminState : AbstractStateDefault {
 
 		public override async Task DefaultAction(MessageEventArgs request) {
-			await Register(request);
+			context.Sender.Send("Handle Admin!");
+			await Task.Yield();
 		}
 
+		public override async Task Initial(MessageEventArgs request) {
+			context.Sender.Send("Welcome Admin!");
+			await Task.Yield();
+		}
 		public override async Task ShowHelp(MessageEventArgs request) {
-			context.Sender.Send("Register help information", request);
+			context.Sender.Send("Admin help information...");
 			await Task.Yield();
 		}
 	}
